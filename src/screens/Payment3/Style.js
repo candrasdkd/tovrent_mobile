@@ -1,0 +1,138 @@
+import {StyleSheet} from 'react-native';
+export default StyleSheet.create({
+  background: {
+    backgroundColor: '#fff',
+    height: '100%',
+    paddingHorizontal: 30,
+  },
+  progressView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  progress: {
+    width: 50,
+    height: 5,
+    // marginHorizontal: 25,
+  },
+  textProgress: {
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#FFf',
+    padding: 6,
+    height: 40,
+    width: 40,
+    borderRadius: 40 / 2,
+    backgroundColor: '#A52A2A',
+  },
+  opacity: {
+    opacity: 0.5,
+  },
+  textCentered: {
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  textTitleCode: {
+    fontSize: 17,
+    marginTop: 20,
+    color: '#393939',
+  },
+  numberPayment: {
+    fontSize: 36,
+    marginVertical: 10,
+    color: '#000000',
+  },
+  textTime: {
+    fontSize: 13,
+    color: '#616167',
+  },
+  timer: {
+    fontSize: 24,
+    marginTop: 20,
+    color: '#9B0A0A',
+  },
+  bankNumber: {
+    fontSize: 24,
+    marginTop: 20,
+    color: '#000000',
+  },
+  bookingNumber: {
+    color: 'green',
+  },
+  textCopy: {
+    fontSize: 13,
+    marginTop: 5,
+    color: '#616167',
+  },
+  textOrder: {
+    marginVertical: 10,
+  },
+  textVehicle: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: '#616167',
+    marginVertical: 2,
+  },
+  textPrice: {
+    fontSize: 30,
+    fontWeight: '600',
+    color: '#393939',
+    marginTop: 20,
+  },
+  priceView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  borderBottom: {
+    height: 45,
+    borderBottomWidth: 1,
+    borderColor: '#DFDEDE',
+  },
+  buttonCopy: {
+    width: 210,
+    height: 42,
+    justifyContent: 'center',
+    alignSelf: 'center',
+    marginVertical: 15,
+    backgroundColor: '#FFCD61',
+    borderRadius: 10,
+  },
+  textButtonCopy: {
+    color: '#393939',
+    fontSize: 13,
+    fontWeight: '900',
+    lineHeight: 25,
+    textAlign: 'center',
+  },
+  enabledButton: {
+    width: 338,
+    height: 57,
+    justifyContent: 'center',
+    alignSelf: 'center',
+    marginVertical: 30,
+    backgroundColor: '#FFCD61',
+    borderRadius: 10,
+    // justifyContent: 'center',
+  },
+  disabledButton: {
+    width: 338,
+    height: 57,
+    justifyContent: 'center',
+    alignSelf: 'center',
+    marginVertical: 30,
+    backgroundColor: '#D4D4D4',
+    borderRadius: 10,
+    // justifyContent: 'center',
+  },
+  textButton: {
+    color: '#393939',
+    fontSize: 18,
+    fontWeight: '900',
+    lineHeight: 25,
+    textAlign: 'center',
+  },
+});

@@ -1,0 +1,65 @@
+import {StyleSheet} from 'react-native';
+export default StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  userWrapper: {
+    width: 237,
+    height: 57,
+    alignSelf: 'flex-end',
+    marginVertical: 10,
+    marginHorizontal: 20,
+  },
+  textUser: {
+    width: 237,
+    height: 57,
+    borderRadius: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    backgroundColor: '#393939',
+    color: '#fff',
+  },
+  ownerWrapper: {
+    width: 237,
+    height: 500,
+    marginVertical: 10,
+    marginHorizontal: 20,
+  },
+  textOwner: {
+    fontSize: 14,
+    borderRadius: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    backgroundColor: '#FFCD61',
+    color: '#4E4E4E',
+  },
+  input: {
+    backgroundColor: 'rgba(217, 217, 217, 0.3)',
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: 'gray',
+    paddingHorizontal: 15,
+    color: '#999999',
+    fontWeight: '600',
+    width: 300,
+    height: 50,
+  },
+  inputView: {
+    flexDirection: 'row',
+    marginHorizontal: 25,
+    alignItems: 'center',
+  },
+  iconView: {
+    width: 50,
+    height: 50,
+    borderRadius: 10,
+    justifyContent: 'center',
+    backgroundColor: '#FFCD61',
+  },
+  iconSend: {
+    fontSize: 20,
+    color: '#393939',
+    textAlign: 'center',
+  },
+});
