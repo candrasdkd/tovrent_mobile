@@ -73,9 +73,10 @@ class Component extends React.Component {
       : this.props.route.params.itemId;
     const token = this.props.auth.token;
     const body = {
-      status_id: this.state.ownerTransaction
-        ? this.state.ownerTransaction
-        : this.state.userTransaction,
+      status_id:
+        this.props.auth.userInfo.statusLevel === 2
+          ? this.state.ownerTransaction
+          : this.state.userTransaction,
     };
     // console.log(this.props.history.data);
     this.props.updateTransaction(params, body, token);
@@ -97,6 +98,7 @@ class Component extends React.Component {
     this.hideModal();
   };
   componentDidMount() {
+    console.log(this.props.route.params)
     if (this.props.route.params.historyId || this.props.history.data) {
       this.props.getHistory(
         this.props.route.params.historyId,
@@ -240,18 +242,16 @@ class Component extends React.Component {
                   <TouchableOpacity
                     activeOpacity={0.7}
                     style={
-                      this.props.history.historyId[0].status_number === 1
+                      this.props.route.params.statusHistory === 1
                         ? styles.disabledButton
                         : styles.enabledButton
                     }
                     onPress={showModal}
                     disabled={
-                      this.props.history.historyId[0].status_number === 1
-                        ? true
-                        : false
+                      this.props.route.params.statusHistory === 1 ? true : false
                     }>
                     <Text style={styles.textButton}>
-                      {this.props.history.historyId[0].status_number === 1
+                      {this.props.route.params.statusHistory === 1
                         ? 'Not Payment'
                         : 'Approved Payment'}
                     </Text>

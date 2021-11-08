@@ -14,12 +14,12 @@ const defaultState = {
   isPending: false,
   isFulfilled: false,
   isRejected: false,
-  data: '',
-  nextPage: {},
-  cars: {},
-  motorbike: {},
-  bike: {},
-  dataById: {},
+  data: [],
+  nextPage: [],
+  cars: [],
+  motorbike: [],
+  bike: [],
+  dataById: [],
   error: {},
 };
 

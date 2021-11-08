@@ -6,9 +6,10 @@ import {Picker} from '@react-native-picker/picker';
 import styles from './Style';
 const Component = props => {
   const [location, setLocation] = React.useState('');
+  const [type, setType] = React.useState('');
   console.log(props.route.params);
   const searchHandler = () => {
-    const filterQuery = `${props.route.params.sendQuery}&location=${location}`;
+    const filterQuery = `${props.route.params.sendQuery}&location=${location}&typeId=${type}`;
     props.navigation.navigate('search', {sendQuery: filterQuery});
     // if (this.props.auth.token === '') {
     //   null;
@@ -112,18 +113,16 @@ const Component = props => {
         </TouchableOpacity>
         <TouchableOpacity style={styles.boxSelect}>
           <Picker
-            selectedValue={location}
-            onValueChange={(itemValue, index) => setLocation(itemValue)}>
+            selectedValue={type}
+            onValueChange={(itemValue, index) => setType(itemValue)}>
             <Picker.Item
               style={styles.textInput}
               enabled={false}
               label="Type"
             />
-            <Picker.Item style={styles.textInput} label="1" value={1} />
-            <Picker.Item style={styles.textInput} label="2" value={2} />
-            <Picker.Item style={styles.textInput} label="3" value={3} />
-            <Picker.Item style={styles.textInput} label="4" value={4} />
-            <Picker.Item style={styles.textInput} label="5" value={5} />
+            <Picker.Item style={styles.textInput} label="Cars" value={1} />
+            <Picker.Item style={styles.textInput} label="Motorbike" value={2} />
+            <Picker.Item style={styles.textInput} label="Bike" value={3} />
           </Picker>
         </TouchableOpacity>
         <TouchableOpacity style={styles.touchContainer}>

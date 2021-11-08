@@ -20,27 +20,27 @@ class Profile extends React.Component {
       modalVisible: false,
     };
   }
+
   showModal = () => {
     this.setState({modalVisible: true});
   };
+
   hideModal = () => {
     this.setState({modalVisible: false});
   };
+
   logoutHandler = () => {
     const token = this.props.auth.token;
     this.props.logout(token);
-    this.props.navigation.replace('home');
-    // this.props.navigation.reset({
-    //   index: 0,
-    //   routes: [{name: 'login'}],
-    // });
   };
+
   submitModal = () => {
     this.logoutHandler();
     this.hideModal();
   };
+
   componentDidMount() {
-    const params = this.props.auth.userInfo.Id;
+    const params = this.props.auth.userInfo.userId;
     const token = this.props.auth.token;
     if (!this.props.auth.token) {
       this.props.navigation.replace('login');
@@ -48,20 +48,25 @@ class Profile extends React.Component {
       this.props.urlGet(params, token);
     }
   }
+  componentDidUpdate() {
+    if (this.props.auth.token === '') {
+      this.props.navigation.replace('home');
+    } 
+  }
   render() {
     return (
       <>
-        {this.props.auth.data.length ? (
+        {this.props.auth.userInfo ? (
           <View>
             <View style={styles.container}>
               <TouchableOpacity
                 onPress={() => this.props.navigation.navigate('edit-profile')}>
-                {this.props.auth.data[0].userImage !== null ? (
+                {this.props.auth.userInfo.userImage ? (
                   <Image
                     style={styles.imageProfile}
                     source={{
                       uri: `${API_URL}${
-                        this.props.auth.data[0].userImage.split(',')[0]
+                        this.props.auth.userInfo?.userImage.split(',')[0]
                       }`,
                     }}
                   />
@@ -73,10 +78,10 @@ class Profile extends React.Component {
                 )}
               </TouchableOpacity>
               <Text style={styles.titleProfile}>
-                {this.props.auth.data[0].userName}
+                {this.props.auth.userInfo.userName}
               </Text>
-              <Text> {this.props.auth.data[0].userEmail}</Text>
-              <Text>{this.props.auth.data[0].userPhone}</Text>
+              <Text> {this.props.auth.userInfo?.userEmail}</Text>
+              <Text>{this.props.auth.userInfo?.userPhone}</Text>
             </View>
             <View style={styles.menuContainer}>
               <TouchableOpacity

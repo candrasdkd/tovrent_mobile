@@ -44,7 +44,7 @@ class Component extends React.Component {
           text="Payment"
           route={() => this.props.navigation.goBack('reservation')}
         />
-        {this.props.auth.data.length ? (
+        {this.props.auth.userInfo ? (
           <ScrollView style={styles.scrollContainer}>
             <View style={styles.progressView}>
               <Text style={styles.textProgress}>1</Text>
@@ -64,7 +64,7 @@ class Component extends React.Component {
             <View style={styles.inputView}>
               <TextInput
                 style={styles.input}
-                defaultValue={this.props.auth.data[0].userIdCard}
+                defaultValue={this.props.auth.userInfo.userCardNumber}
                 placeholder="ID card number"
                 placeholderTextColor="#999999"
                 keyboardType="numeric"
@@ -72,14 +72,14 @@ class Component extends React.Component {
               />
               <TextInput
                 style={styles.input}
-                defaultValue={this.props.auth.data[0].userName}
+                defaultValue={this.props.auth.userInfo.userFullName}
                 placeholder="Full Name"
                 placeholderTextColor="#999999"
                 // onChangeText={value => setEmail(value)}
               />
               <TextInput
                 style={styles.input}
-                defaultValue={this.props.auth.data[0].userPhone}
+                defaultValue={this.props.auth.userInfo.userPhone}
                 placeholder="Mobile phone (must be active)"
                 placeholderTextColor="#999999"
                 keyboardType="number-pad"
@@ -87,14 +87,14 @@ class Component extends React.Component {
               />
               <TextInput
                 style={styles.input}
-                defaultValue={this.props.auth.data[0].userEmail}
+                defaultValue={this.props.auth.userInfo.userEmail}
                 placeholder="Email address"
                 placeholderTextColor="#999999"
                 // onChangeText={value => setPhone(value)}
               />
               <TextInput
                 style={styles.input}
-                defaultValue={this.props.auth.data[0].userAddress}
+                defaultValue={this.props.auth.userInfo.userAddress}
                 placeholder="Location (home, office, etc.)"
                 placeholderTextColor="#999999"
                 // onChangeText={value => setPhone(value)}
@@ -133,11 +133,12 @@ class Component extends React.Component {
                   onPress={() => {
                     this.props.navigation.navigate('second-payment', {
                       ...bodyData,
-                      idCard: this.props.auth.data[0].userIdCard,
-                      userName: this.props.auth.data[0].userName,
-                      userEmail: this.props.auth.data[0].userEmail,
-                      userPhone: this.props.auth.data[0].userPhone,
-                      userAddress: this.props.auth.data[0].userAddress,
+                      userId: this.props.auth.userInfo.userId,
+                      idCard: this.props.auth.userInfo.userCardNumber,
+                      userFullName: this.props.auth.userInfo.userFullName,
+                      userEmail: this.props.auth.userInfo.userEmail,
+                      userPhone: this.props.auth.userInfo.userPhone,
+                      userAddress: this.props.auth.userInfo.userAddress,
                       paymentOption: this.state.payment,
                     });
                   }}>

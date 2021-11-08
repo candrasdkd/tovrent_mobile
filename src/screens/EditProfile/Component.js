@@ -37,7 +37,7 @@ class Component extends React.Component {
       phone: this.props.auth.data[0].userPhone,
       dob: new Date(this.props.auth.data[0].userDOB),
       address: this.props.auth.data[0].userAddress,
-      cardNumber: this.props.auth.data[0].userIdCard,
+      cardNumber: this.props.auth.data[0].userCardNumber,
     };
   }
   showModalUpload = () => {
@@ -134,6 +134,7 @@ class Component extends React.Component {
     form.append('address', this.state.address);
     form.append('card_number', this.state.cardNumber);
     this.props.urlUpdate(params, form, token);
+    this.props.navigation.navigate('ProfileScreen');
     ToastAndroid.show('Profile Updated!', ToastAndroid.SHORT);
   };
   cameraHandler = () => {

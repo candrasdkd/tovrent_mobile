@@ -65,6 +65,7 @@ class History extends React.Component {
                             ? this.props.navigation.navigate('third-payment', {
                                 historyId: history.id,
                                 userId: history.user,
+                                statusHistory: history.status_number,
                               })
                             : this.props.navigation.navigate('history-detail', {
                                 historyId: history.id,

@@ -5,7 +5,8 @@ import {connect} from 'react-redux';
 import IconHeader from '../../components/IconHeader/Component';
 import {getVehicleAction} from '../../redux/ActionCreators/vehicle';
 import Icon from 'react-native-vector-icons/Ionicons';
-import axios from 'axios';
+import Axios from 'axios';
+
 import {
   View,
   Text,
@@ -19,28 +20,37 @@ class ViewMore extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      data: [],
       nextPage: null,
     };
   }
 
   componentDidMount() {
     const {query} = this.props.route.params;
-    const nextItem = `${query}&order_by=id&sort=ASC&limit=5`;
-    this.props.urlVehicle(nextItem);
-    console.log(this.props.vehicle.nextPage.nextPage);
+    Axios.get(`${API_URL}vehicles/${query}`)
+      .then(({data}) => {
+        console.log(data);
+        this.setState({
+          data: data.result.data,
+          nextPage: data.result.nextPage,
+        });
+      })
+      .catch(err => {
+        console.log(err);
+      });
   }
   render() {
     const {title} = this.props.route.params;
     return (
       <>
-        {this.props.vehicle.data.length ? (
+        {this.state.data ? (
           <View style={styles.container}>
             <IconHeader
               text={title}
               route={() => this.props.navigation.goBack('home')}
             />
             <FlatList
-              data={this.props.vehicle.data}
+              data={this.state.data}
               renderItem={({item: vehicle}) => {
                 return (
                   <View style={styles.itemMenu}>
@@ -84,18 +94,20 @@ class ViewMore extends React.Component {
                 );
               }}
               keyExtractor={(_, index) => index}
-              // onEndReached={() => {
-              //   this.state.nextPage !== null &&
-              //     axios
-              //       .get(this.props.vehicle.nextPage.nextPage)
-              //       .then(result => {
-              //         setStatesetNexPage(result);
-              //         return setData(prevState => [
-              //           ...prevState,
-              //           ...result.data.result.data,
-              //         ]);
-              //       });
-              // }}
+              onEndReached={() => {
+                this.state.nextPage !== null &&
+                  Axios.get(API_URL + this.state.nextPage)
+                    .then(({data}) => {
+                      console.log('pusing', data);
+                      this.setState({
+                        data: [...this.state.data, ...data.result.data],
+                        nextPage: data.result.nextPage,
+                      });
+                    })
+                    .catch(err => {
+                      console.log(err);
+                    });
+              }}
             />
           </View>
         ) : (

@@ -106,18 +106,21 @@ class Component extends React.Component {
     } else {
       return this.props.navigation.navigate('first-payment', {
         userId: this.props.auth.userInfo.Id,
-        itemId: this.props.vehicle.dataById[0].id,
-        itemName: this.props.vehicle.dataById[0].name,
+        ownerId: this.props.vehicle.dataById[0].vehicleOwnerId,
+        itemLocation: this.props.vehicle.dataById[0].vehicleCity,
+        itemNameType: this.props.vehicle.dataById[0].vehicleNameType,
+        itemId: this.props.vehicle.dataById[0].vehicleId,
+        itemName: this.props.vehicle.dataById[0].vehicleName,
         itemAmountRented: this.state.count,
         itemPrice:
           this.state.count *
-          this.props.vehicle.dataById[0].price *
+          this.props.vehicle.dataById[0].vehiclePrice *
           this.state.duration,
         bookingDate: this.formatDate(this.addDays(this.state.ReserveDate, 0)),
         expiredDate: this.formatDate(
           this.addDays(this.state.ReserveDate, this.state.duration),
         ),
-        itemPicture: this.props.vehicle.dataById[0].picture.split(',')[0],
+        itemPicture: this.props.vehicle.dataById[0].vehicleImage.split(',')[0],
         // model,
         itemAmountDay: this.state.duration,
       });
@@ -162,11 +165,10 @@ class Component extends React.Component {
       decrementCount,
       incrementCount,
       hideModalError,
-      submitHandler,
     } = this;
     return (
       <>
-        {this.props.vehicle.dataById.length ? (
+        {this.props.vehicle.dataById.length > 0 ? (
           <ScrollView>
             <View style={styles.body}>
               <Image
@@ -174,7 +176,7 @@ class Component extends React.Component {
                 resizeMethod="resize"
                 source={{
                   uri: `${API_URL}${
-                    this.props.vehicle.dataById[0].picture.split(',')[0]
+                    this.props.vehicle.dataById[0].vehicleImage.split(',')[0]
                   }`,
                 }}
               />
@@ -198,27 +200,28 @@ class Component extends React.Component {
                 <View>
                   {/* <Text style={styles.titleText}>{props.vehicle.dataById[0].name}</Text> */}
                   <Text style={styles.titleText}>
-                    {this.props.vehicle.dataById[0].name}
+                    {this.props.vehicle.dataById[0].vehicleName}
                     {'\n'}
                     Rp.{' '}
-                    {(
+                    {Number(
                       count *
-                      this.props.vehicle.dataById[0].price *
-                      duration
+                        this.props.vehicle.dataById[0].vehiclePrice *
+                        duration,
                     ).toLocaleString('de-DE')}
                     /day
                   </Text>
                   <Text style={styles.subtitleText}>
-                    Max for {this.props.vehicle.dataById[0].capacity} person
+                    Max for {this.props.vehicle.dataById[0].vehicleCapacity}{' '}
+                    person
                   </Text>
                   <Text style={styles.subtitleText}>No prepayment</Text>
                   <Text
                     style={
-                      this.props.vehicle.dataById[0].quantity > 0
+                      this.props.vehicle.dataById[0].vehicleQuantity > 0
                         ? styles.availableTxt
                         : styles.notAvailableTxt
                     }>
-                    {this.props.vehicle.dataById[0].quantity > 0
+                    {this.props.vehicle.dataById[0].vehicleQuantity > 0
                       ? 'Available'
                       : 'Not Available'}
                   </Text>
@@ -232,8 +235,8 @@ class Component extends React.Component {
               <View style={styles.locationWrapper}>
                 <Icon name="location" style={styles.iconLocation} />
                 <Text style={styles.textLocation}>
-                  {this.props.vehicle.dataById[0].address},
-                  {this.props.vehicle.dataById[0].city}
+                  {this.props.vehicle.dataById[0].vehicleAddress},
+                  {this.props.vehicle.dataById[0].vehicleCity}
                 </Text>
               </View>
               <View style={styles.locationWrapper}>
@@ -263,7 +266,7 @@ class Component extends React.Component {
                   <Text style={styles.amount}>{count}</Text>
                   <TouchableOpacity
                     onPress={() =>
-                      count < this.props.vehicle.dataById[0].quantity &&
+                      count < this.props.vehicle.dataById[0].vehicleQuantity &&
                       incrementCount(count + 1)
                     }>
                     <View style={styles.buttonCount}>
@@ -278,7 +281,9 @@ class Component extends React.Component {
                   onPress={() => setOpenDate(true)}>
                   <Text style={styles.textDate}>
                     {typeof ReserveDate === 'object'
-                      ? ReserveDate.toLocaleString()
+                      ? ` ${new Date(ReserveDate).getFullYear()}-${new Date(
+                          ReserveDate,
+                        ).getMonth()}-${new Date(ReserveDate).getDate()}`
                       : ReserveDate}
                   </Text>
                 </Pressable>
@@ -326,18 +331,18 @@ class Component extends React.Component {
                   </Picker>
                 </View>
               </View>
-              {this.props.vehicle.dataById[0].owner ===
+              {this.props.vehicle.dataById[0].vehicleOwnerId ===
               this.props.auth.userInfo.Id ? (
                 <TouchableOpacity
                   activeOpacity={0.7}
                   style={
-                    this.props.vehicle.dataById[0].quantity > 0
+                    this.props.vehicle.dataById[0].vehicleQuantity > 0
                       ? styles.buttonEnabled
                       : styles.buttonDisabled
                   }
                   onPress={() =>
                     this.props.navigation.navigate('edit-vehicle', {
-                      vehicleId: this.props.vehicle.dataById[0].id,
+                      vehicleId: this.props.vehicle.dataById[0].vehicleId,
                     })
                   }>
                   <Text style={styles.reservationText}>Edit Item</Text>
@@ -346,13 +351,15 @@ class Component extends React.Component {
                 <TouchableOpacity
                   activeOpacity={0.7}
                   style={
-                    this.props.vehicle.dataById[0].quantity > 0
+                    this.props.vehicle.dataById[0].vehicleQuantity > 0
                       ? styles.buttonEnabled
                       : styles.buttonDisabled
                   }
                   onPress={onPressHandler}
                   disabled={
-                    this.props.vehicle.dataById[0].quantity < 1 ? true : false
+                    this.props.vehicle.dataById[0].vehicleQuantity < 1
+                      ? true
+                      : false
                   }>
                   <Text style={styles.reservationText}>Reservation</Text>
                 </TouchableOpacity>

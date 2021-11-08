@@ -3,10 +3,13 @@ import {View, Text, Image, TouchableOpacity, FlatList} from 'react-native';
 import styles from './Style';
 import {API_URL} from '@env';
 import {useNavigation} from '@react-navigation/native';
+// import Axios from 'axios';
 
 const Component = props => {
-  const {title, data, pressHandler} = props;
+  const {title, vehicleData, pressHandler} = props;
+
   const navigation = useNavigation();
+
   return (
     <View>
       <View style={styles.textContainer}>
@@ -17,7 +20,7 @@ const Component = props => {
       </View>
       <FlatList
         horizontal={true}
-        data={data}
+        data={vehicleData}
         renderItem={({item: vehicle}) => {
           return (
             <View style={styles.cardContainer}>
@@ -38,11 +41,18 @@ const Component = props => {
           );
         }}
         keyExtractor={(_, index) => index}
-        // onEndReached={() => {
-        // pageInfo.currentPage < pageInfo.totalPage
-        // pageInfo.nextPage !== null
-        // setData(prevState => [...prevState, ...page2]);
-        // }}
+        // onEndReached={
+        //   pageVehicle !== null &&
+        //   Axios.get(API_URL + pageVehicle)
+        //     .then(({data}) => {
+        //       console.log(data);
+        //       setPageVehicle(data.result.nextPage);
+        //       return setdataPaginasi([...dataPaginasi, ...data.result.data]);
+        //     })
+        //     .catch(err => {
+        //       console.log(err);
+        //     })
+
         // onEndReachedThreshold={0.1}
       />
     </View>

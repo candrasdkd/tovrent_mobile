@@ -3,12 +3,12 @@ import {API_URL} from '@env';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // const url = process.env.REACT_APP_BASE_URL;
-export const postLogin = body => {
-  return Axios.post(`${API_URL}auth/login`, body);
-};
-
 export const postRegister = body => {
   return Axios.post(`${API_URL}auth/register`, body);
+};
+
+export const postLogin = body => {
+  return Axios.post(`${API_URL}auth/login`, body);
 };
 
 export const getProfile = (params, token) => {

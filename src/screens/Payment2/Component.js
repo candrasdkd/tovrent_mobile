@@ -38,19 +38,22 @@ class Component extends React.Component {
     const body = {
       vehicle_id: this.props.route.params.itemId,
       user_id: this.props.route.params.userId,
+      owner_id: this.props.route.params.ownerId,
+      location: this.props.route.params.itemLocation,
+      type: this.props.route.params.itemNameType,
       price: this.props.route.params.itemPrice,
       from_date: `${this.state.bookingDate.getFullYear()}-${this.state.bookingDate.getMonth()}-${this.state.bookingDate.getDate()}`,
       to_date: `${this.state.expiredDate.getFullYear()}-${this.state.expiredDate.getMonth()}-${this.state.expiredDate.getDate()}`,
       status_id: this.state.statusTransaction,
       quantity: this.props.route.params.itemAmountRented,
       method_payment: this.props.route.params.paymentOption,
-      booking_code: this.generateCode(),
+      booking_code: this.generateCode,
       days: this.props.route.params.itemAmountDay,
     };
     this.props.createHistory(body, token);
     this.props.navigation.navigate('third-payment', {
       ...bodyData,
-      transactionId: this.props.history.data,
+      transactionId: this.props.history.data.result,
       booking_code: this.generateCode(),
     });
     ToastAndroid.show(
@@ -63,7 +66,7 @@ class Component extends React.Component {
     // let bodyData = {...this.props.route.params};
     const convertPrice =
       this.props.route.params.itemPrice.toLocaleString('de-DE');
-    console.log(this.props.history.data);
+    // console.log(this.props.history.data);
     const {
       itemPicture,
       itemName,
@@ -73,7 +76,7 @@ class Component extends React.Component {
       bookingDate,
       expiredDate,
       idCard,
-      userName,
+      userFullName,
       userEmail,
       userPhone,
       userAddress,
@@ -122,7 +125,7 @@ class Component extends React.Component {
               </View>
               <Text style={styles.textUser}>ID : {idCard}</Text>
               <Text style={styles.textUser}>
-                {userName} ({userEmail})
+                {userFullName}({userEmail})
               </Text>
               <Text style={styles.textUser}>{userPhone}</Text>
               <Text style={[styles.textUser, styles.borderBottom]}>

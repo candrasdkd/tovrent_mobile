@@ -10,8 +10,8 @@ import {ActionType} from 'redux-promise-middleware';
 
 const defaultState = {
   token: '',
-  userInfo: {},
-  data: {},
+  userInfo: [],
+  data: [],
   isPending: false,
   isFulfilled: false,
   isRejected: false,
@@ -65,8 +65,8 @@ const authReducer = (prevstate = defaultState, action) => {
         isPending: false,
         isFulfilled: true,
         token: '',
-        userInfo: {},
-        data: {},
+        userInfo: [],
+        data: [],
         isLogin: false,
       };
     case REGISTER.concat('_', Pending):
@@ -88,7 +88,6 @@ const authReducer = (prevstate = defaultState, action) => {
         ...prevstate,
         isPending: false,
         isFulfilled: true,
-        authInfo: action.payload.data.result,
       };
     case PATCH_PROFILE.concat('_', Pending):
       return {

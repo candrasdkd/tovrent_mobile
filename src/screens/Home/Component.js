@@ -3,6 +3,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './Style';
 import {connect} from 'react-redux';
 import Card from '../../components/HomeCard/Component';
+import Axios from 'axios';
+import {API_URL} from '@env';
 // import {notifikasi} from '../../components/Notification/Component';
 import {
   View,
@@ -14,12 +16,12 @@ import {
   ActivityIndicator,
   ImageBackground,
 } from 'react-native';
-import {
-  getVehicleAction,
-  getBike,
-  getCars,
-  getMotorbike,
-} from '../../redux/ActionCreators/vehicle';
+// import {
+//   getVehicleAction,
+//   getBike,
+//   getCars,
+//   getMotorbike,
+// } from '../../redux/ActionCreators/vehicle';
 import {profileAction} from '../../redux/ActionCreators/auth';
 
 class Home extends React.Component {
@@ -27,6 +29,15 @@ class Home extends React.Component {
     super(props);
     this.state = {
       vehicleName: '',
+      data: [],
+      cars: [],
+      motorbike: [],
+      bike: [],
+      popular: [],
+      nextPage: null,
+      nextPageCars: null,
+      nextPageMotorbike: null,
+      nextPageBike: null,
     };
   }
   nameHandler = text => {
@@ -50,12 +61,12 @@ class Home extends React.Component {
   };
 
   carsHandler = () => {
-    const query = '?typeId=1';
+    const query = '?type_id=1&sort=ASC&limit=10';
     this.props.navigation.navigate('view-more', {query: query, title: 'Cars'});
   };
 
   motorbikeHandler = () => {
-    const query = '?typeId=2';
+    const query = '?type_id=2';
     this.props.navigation.navigate('view-more', {
       query: query,
       title: 'Motorbike',
@@ -63,21 +74,57 @@ class Home extends React.Component {
   };
 
   bikeHandler = () => {
-    const query = '?typeId=3';
+    const query = '?type_id=3';
     this.props.navigation.navigate('view-more', {query: query, title: 'Bike'});
   };
 
   componentDidMount() {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      this.props.urlCars();
-      this.props.urlMotorbike();
-      this.props.urlBike();
-      if (this.props.auth.token !== '') {
-        this.props.getProfile(
-          this.props.auth.userInfo.Id,
-          this.props.auth.token,
-        );
-      }
+      const getPerType = filter => {
+        Axios.get(`${API_URL}vehicles/?type_id=${filter}&limit=10`)
+          .then(({data}) => {
+            this.setState({data: data.result.data});
+            if (filter === 1) {
+              // console.log(data);
+              this.setState({
+                cars: data.result.data,
+                nextPageCars: data.result.nextPageCars,
+              });
+            }
+            if (filter === 2) {
+              this.setState({
+                motorbike: data.result.data,
+                nextPageMotorbike: data.result.nextPageMotorbike,
+              });
+            }
+            if (filter === 3) {
+              this.setState({
+                bike: data.result.data,
+                nextPageBike: data.result.nextPageBike,
+              });
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      };
+
+      Axios.get(`${API_URL}vehicles/popular/`)
+        .then(({data}) => {
+          this.setState({
+            popular: data.result.data,
+            nextPage: data.result.nextPage,
+          });
+        })
+        .catch(err => {
+          console.log(err);
+        });
+      getPerType(1);
+      getPerType(2);
+      getPerType(3);
+      // this.props.urlCars();
+      // this.props.urlMotorbike();
+      // this.props.urlBike();
     });
   }
   componentWillUnmount() {
@@ -87,9 +134,7 @@ class Home extends React.Component {
     return (
       <>
         <StatusBar hidden={true} />
-        {this.props.vehicle.cars.length &&
-        this.props.vehicle.motorbike.length &&
-        this.props.vehicle.bike.length ? (
+        {this.state.data ? (
           <ScrollView style={styles.scrollContainer}>
             <ImageBackground
               style={styles.bgHome}
@@ -123,18 +168,23 @@ class Home extends React.Component {
                 </TouchableOpacity>
               ))}
             <Card
+              title="Popular"
+              vehicleData={this.state.popular}
+              pressHandler={this.bikeHandler}
+            />
+            <Card
               title="Cars"
-              data={this.props.vehicle.cars}
+              vehicleData={this.state.cars}
               pressHandler={this.carsHandler}
             />
             <Card
               title="Motorbike"
-              data={this.props.vehicle.motorbike}
+              vehicleData={this.state.motorbike}
               pressHandler={this.motorbikeHandler}
             />
             <Card
               title="Bike"
-              data={this.props.vehicle.bike}
+              vehicleData={this.state.bike}
               pressHandler={this.bikeHandler}
             />
           </ScrollView>
@@ -156,18 +206,18 @@ const mapStateToProps = ({auth, vehicle}) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    urlVehicle: query => {
-      dispatch(getVehicleAction(query));
-    },
-    urlCars: () => {
-      dispatch(getCars());
-    },
-    urlMotorbike: () => {
-      dispatch(getMotorbike());
-    },
-    urlBike: () => {
-      dispatch(getBike());
-    },
+    // urlVehicle: query => {
+    //   dispatch(getVehicleAction(query));
+    // },
+    // urlCars: () => {
+    //   dispatch(getCars());
+    // },
+    // urlMotorbike: () => {
+    //   dispatch(getMotorbike());
+    // },
+    // urlBike: () => {
+    //   dispatch(getBike());
+    // },
     getProfile: (params, token) => {
       dispatch(profileAction(params, token));
     },

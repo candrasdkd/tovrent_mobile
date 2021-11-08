@@ -103,7 +103,7 @@ const historyReducer = (prevstate = defaultState, action) => {
         ...prevstate,
         isPending: false,
         isFulfilled: true,
-        data: action.payload.data.result,
+        data: action.payload,
       };
     case PATCH_HISTORY.concat('_', Pending):
       return {

@@ -33,25 +33,25 @@ class Login extends Component {
 
   submitHandler = () => {
     if (this.state.email.length < 1) {
-      return this.setState({
+      this.setState({
         showMessage: true,
         errorMessage: 'Email is Required',
       });
     }
     if (!this.state.email.includes('@')) {
-      return this.setState({
+      this.setState({
         showMessage: true,
         errorMessage: 'Please input a Valid Email',
       });
     }
     if (this.state.password.length < 1) {
-      return this.setState({
+      this.setState({
         showMessage: true,
         errorMessage: 'Password is Required',
       });
     }
     if (this.state.password.length < 6) {
-      return this.setState({
+      this.setState({
         showMessage: true,
         errorMessage: 'Password must have 6 or more characters!',
       });
@@ -62,16 +62,18 @@ class Login extends Component {
         errorMessage: 'Invalid E-mail or Password!',
       });
     }
-    const form = new URLSearchParams();
-    form.append('email', this.state.email);
-    form.append('password', this.state.password);
-    this.props.urlLogin(form);
-
+    // const form = new URLSearchParams();
+    const body = {
+      email: this.state.email,
+      password: this.state.password,
+    };
+    this.props.urlLogin(body);
     ToastAndroid.show('Login has success', ToastAndroid.SHORT);
   };
-  componentDidUpdate() {
+  componentDidUpdate(a, b) {
     if (this.props.auth.token !== '') {
-      return this.props.navigation.replace('home');
+      this.props.navigation.replace('home');
+      console.log('test', a, b);
     }
   }
   render() {
