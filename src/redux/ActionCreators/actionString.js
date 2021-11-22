@@ -16,3 +16,7 @@ export const GET_HISTORY_USER = 'GET_HISTORY_USER';
 export const GET_HISTORY_OWNER = 'GET_HISTORY_OWNER';
 export const POST_HISTORY = 'POST_HISTORY';
 export const PATCH_HISTORY = 'PATCH_HISTORY';
+export const RESET_STATE = 'RESET_STATE';
+export const SEND_EMAIL = 'SEND_EMAIL';
+export const CHECK_CODE = 'CHECK_CODE';
+export const CHANGE_PASSWORD = 'CHANGE_PASSWORD';

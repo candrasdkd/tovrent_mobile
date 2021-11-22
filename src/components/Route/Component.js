@@ -1,6 +1,8 @@
 import Login from '../../screens/Login/Component';
 import Register from '../../screens/Register/Component';
-import ForgetPassword from '../../screens/ForgetPassword/Component';
+import SendEmail from '../../screens/ForgetPassword/SendEmail/Component';
+import CheckCode from '../../screens/ForgetPassword/CheckCode/Component';
+import ChangePassword from '../../screens/ForgetPassword/ChangePassword/Component';
 import DetailChat from '../../screens/DetailChat/Component';
 import Reservation from '../../screens/Reservation/Component';
 import FirstPayment from '../../screens/Payment1/Component';
@@ -18,7 +20,9 @@ import Splash from '../../screens/SplashScreen/Component';
 export {
   Login,
   Register,
-  ForgetPassword,
+  SendEmail,
+  CheckCode,
+  ChangePassword,
   DetailChat,
   Reservation,
   FirstPayment,

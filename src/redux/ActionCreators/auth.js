@@ -5,6 +5,7 @@ import {
   PATCH_PROFILE,
   GET_PROFILE,
   PATCH_PASSWORD,
+  RESET_STATE,
 } from './actionString';
 import {
   deleteLogout,
@@ -54,5 +55,11 @@ export const profileAction = (params, token) => {
   return {
     type: GET_PROFILE,
     payload: getProfile(params, token),
+  };
+};
+
+export const resetStateAction = () => {
+  return {
+    type: RESET_STATE,
   };
 };

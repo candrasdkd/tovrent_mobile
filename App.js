@@ -2,7 +2,9 @@ import React from 'react';
 import {
   Login,
   Register,
-  ForgetPassword,
+  SendEmail,
+  CheckCode,
+  ChangePassword,
   DetailChat,
   Reservation,
   FirstPayment,
@@ -36,7 +38,9 @@ const App = () => {
             <StackScreen name="home" component={TabScreen} />
             <StackScreen name="login" component={Login} />
             <StackScreen name="register" component={Register} />
-            <StackScreen name="forget-password" component={ForgetPassword} />
+            <StackScreen name="forget-password" component={SendEmail} />
+            <StackScreen name="check-code" component={CheckCode} />
+            <StackScreen name="change-password" component={ChangePassword} />
             <StackScreen name="detail-chat" component={DetailChat} />
             <StackScreen name="reservation" component={Reservation} />
             <StackScreen name="edit-vehicle" component={EditItem} />

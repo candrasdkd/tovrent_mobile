@@ -33,12 +33,9 @@ export default StyleSheet.create({
   input: {
     backgroundColor: 'rgba(217, 217, 217, 0.5)',
     borderRadius: 10,
-    paddingLeft: 15,
-    paddingRight: 15,
     marginHorizontal: 30,
     marginTop: 20,
     fontWeight: '900',
-    textAlign: 'center',
     height: 50,
     color: '#fff',
   },

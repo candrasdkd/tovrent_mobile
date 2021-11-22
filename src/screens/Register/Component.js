@@ -33,15 +33,6 @@ class Register extends Component {
   hideModal = () => {
     this.setState({modalVisible: false});
   };
-  setEmail = text => {
-    this.setState({email: text});
-  };
-  setPhone = text => {
-    this.setState({phone: text});
-  };
-  setPassword = text => {
-    this.setState({password: text});
-  };
 
   errorHandler = () => {
     if (
@@ -106,14 +97,7 @@ class Register extends Component {
   };
 
   render() {
-    const {
-      hideModal,
-      setEmail,
-      setPhone,
-      setPassword,
-      errorHandler,
-      submitModal,
-    } = this;
+    const {hideModal, errorHandler, submitModal} = this;
     return (
       <>
         <StatusBar hidden={true} />
@@ -131,25 +115,24 @@ class Register extends Component {
               style={styles.input}
               placeholder="Email"
               placeholderTextColor="#fff"
-              onChangeText={setEmail}
+              onChangeText={email => this.setState({email})}
             />
             <TextInput
               style={styles.input}
               placeholder="Mobile Phone"
               placeholderTextColor="#fff"
-              onChangeText={setPhone}
+              onChangeText={phone => this.setState({phone})}
             />
             <TextInput
               style={styles.input}
               placeholder="Password"
               placeholderTextColor="#fff"
               secureTextEntry={true}
-              onChangeText={setPassword}
+              onChangeText={password => this.setState({password})}
             />
             <TouchableOpacity
               activeOpacity={0.7}
               style={styles.buttonRegister}
-              // onPress={this.submitHandler}>
               onPress={errorHandler}>
               <Text style={styles.textButton}>Sign up</Text>
             </TouchableOpacity>

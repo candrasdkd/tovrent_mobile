@@ -4,6 +4,7 @@ import {
   REGISTER,
   GET_PROFILE,
   PATCH_PROFILE,
+  RESET_STATE,
 } from '../ActionCreators/actionString';
 import {ActionType} from 'redux-promise-middleware';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -130,6 +131,14 @@ const authReducer = (prevstate = defaultState, action) => {
         isPending: false,
         isFulfilled: true,
         data: action.payload.data.result,
+      };
+    case RESET_STATE:
+      return {
+        ...prevstate,
+        isPending: false,
+        isFulfilled: false,
+        isRejected: false,
+        status: '',
       };
     default:
       return prevstate;

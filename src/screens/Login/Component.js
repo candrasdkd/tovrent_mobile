@@ -24,13 +24,6 @@ class Login extends Component {
     };
   }
 
-  handleEmail = text => {
-    this.setState({email: text});
-  };
-  handlePassword = text => {
-    this.setState({password: text});
-  };
-
   submitHandler = () => {
     if (this.state.email.length < 1) {
       this.setState({
@@ -62,7 +55,6 @@ class Login extends Component {
         errorMessage: 'Invalid E-mail or Password!',
       });
     }
-    // const form = new URLSearchParams();
     const body = {
       email: this.state.email,
       password: this.state.password,
@@ -70,10 +62,9 @@ class Login extends Component {
     this.props.urlLogin(body);
     ToastAndroid.show('Login has success', ToastAndroid.SHORT);
   };
-  componentDidUpdate(a, b) {
+  componentDidUpdate() {
     if (this.props.auth.token !== '') {
       this.props.navigation.replace('home');
-      console.log('test', a, b);
     }
   }
   render() {
@@ -95,14 +86,14 @@ class Login extends Component {
               autoCorrect={false}
               placeholder="Email"
               placeholderTextColor="#fff"
-              onChangeText={this.handleEmail}
+              onChangeText={email => this.setState({email})}
             />
             <TextInput
               style={style.input}
               placeholder="Password"
               secureTextEntry={true}
               placeholderTextColor="#fff"
-              onChangeText={this.handlePassword}
+              onChangeText={password => this.setState({password})}
             />
             <Text
               style={style.middleText}

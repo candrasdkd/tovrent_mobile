@@ -4,6 +4,7 @@ import {createLogger} from 'redux-logger';
 import {persistStore, persistReducer} from 'redux-persist';
 import rpm from 'redux-promise-middleware';
 import authReducer from './Reducers/auth';
+import userReducer from './Reducers/user';
 import vehicleReducer from './Reducers/vehicle';
 import historyReducer from './Reducers/history';
 
@@ -24,6 +25,7 @@ const reducers = combineReducers({
   // vehicle: persistReducer(vehiclePersistConfig, vehicleReducer),
   vehicle: vehicleReducer,
   history: historyReducer,
+  user: userReducer,
 });
 
 const logger = createLogger();

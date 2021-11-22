@@ -6,11 +6,46 @@ import {
   View,
   TouchableOpacity,
   TextInput,
+  ToastAndroid,
 } from 'react-native';
+import {
+  sendEmailAction,
+  resetStateAction,
+} from '.././../../redux/ActionCreators/user';
+import {useSelector, useDispatch} from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
-import style from './Style';
+import style from '../Style';
 
-const Component = props => {
+const SendEmail = props => {
+  const reduxUser = useSelector(state => state.user);
+  const dispatch = useDispatch();
+  const [email, setEmail] = React.useState('');
+
+  const onSubmit = () => {
+    const body = {
+      email,
+    };
+    dispatch(sendEmailAction(body));
+  };
+
+  React.useEffect(() => {
+    if (reduxUser.isFulfilled) {
+      return (
+        props.navigation.navigate('check-code', {
+          email,
+        }) && dispatch(resetStateAction())
+      );
+    }
+    if (reduxUser.status === 404) {
+      ToastAndroid.show('Email not found', ToastAndroid.SHORT);
+    }
+  }, [
+    dispatch,
+    email,
+    props.navigation,
+    reduxUser.isFulfilled,
+    reduxUser.status,
+  ]);
   return (
     <>
       <StatusBar hidden={true} />
@@ -18,7 +53,7 @@ const Component = props => {
         style={style.imageBackground}
         resizeMode="cover"
         //We are using online image to set background
-        source={require('../../../assets/images/bg-forget.png')}>
+        source={require('../../../../assets/images/bg-forget.png')}>
         <View style={style.background}>
           <View style={style.icon}>
             <Icon name="chevron-back-outline" color={'#fff'} size={30} />
@@ -34,11 +69,16 @@ const Component = props => {
           </Text>
           <TextInput
             style={style.input}
+            autoCorrect={false}
             placeholder="Enter your email adress"
-            secureTextEntry={true}
             placeholderTextColor="#fff"
+            keyboardType="email-address"
+            onChangeText={text => setEmail(text)}
           />
-          <TouchableOpacity activeOpacity={0.7} style={style.buttonSend}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={style.buttonSend}
+            onPress={onSubmit}>
             <Text style={style.textButton}>Send Code</Text>
           </TouchableOpacity>
           <TouchableOpacity activeOpacity={0.7} style={style.buttonResend}>
@@ -50,4 +90,4 @@ const Component = props => {
   );
 };
 
-export default Component;
+export default SendEmail;
