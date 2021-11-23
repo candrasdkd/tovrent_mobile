@@ -51,7 +51,6 @@ class Notification {
        *     requestPermissions: Platform.OS === 'ios'
        */
       requestPermissions: true,
-      requestPermissions: Platform.OS === 'ios',
     });
   };
   sendChannel = channel => {

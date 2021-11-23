@@ -2,8 +2,6 @@ import {
   SIGN_IN,
   SIGN_OUT,
   REGISTER,
-  GET_PROFILE,
-  PATCH_PROFILE,
   RESET_STATE,
 } from '../ActionCreators/actionString';
 import {ActionType} from 'redux-promise-middleware';
@@ -12,7 +10,6 @@ import {ActionType} from 'redux-promise-middleware';
 const defaultState = {
   token: '',
   userInfo: [],
-  data: [],
   isPending: false,
   isFulfilled: false,
   isRejected: false,
@@ -67,7 +64,6 @@ const authReducer = (prevstate = defaultState, action) => {
         isFulfilled: true,
         token: '',
         userInfo: [],
-        data: [],
         isLogin: false,
       };
     case REGISTER.concat('_', Pending):
@@ -89,48 +85,6 @@ const authReducer = (prevstate = defaultState, action) => {
         ...prevstate,
         isPending: false,
         isFulfilled: true,
-      };
-    case PATCH_PROFILE.concat('_', Pending):
-      return {
-        ...prevstate,
-        isPending: true,
-        isFulfilled: false,
-        isRejected: false,
-      };
-    case PATCH_PROFILE.concat('_', Rejected):
-      return {
-        ...prevstate,
-        isPending: false,
-        isRejected: true,
-        error: action.payload,
-      };
-    case PATCH_PROFILE.concat('_', Fulfilled):
-      return {
-        ...prevstate,
-        isPending: false,
-        isFulfilled: true,
-        data: action.payload.data.result,
-      };
-    case GET_PROFILE.concat('_', Pending):
-      return {
-        ...prevstate,
-        isPending: true,
-        isFulfilled: false,
-        isRejected: false,
-      };
-    case GET_PROFILE.concat('_', Rejected):
-      return {
-        ...prevstate,
-        isPending: false,
-        isRejected: true,
-        error: action.payload,
-      };
-    case GET_PROFILE.concat('_', Fulfilled):
-      return {
-        ...prevstate,
-        isPending: false,
-        isFulfilled: true,
-        data: action.payload.data.result,
       };
     case RESET_STATE:
       return {

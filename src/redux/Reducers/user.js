@@ -2,7 +2,10 @@ import {
   SEND_EMAIL,
   CHECK_CODE,
   CHANGE_PASSWORD,
+  GET_PROFILE,
+  PATCH_PROFILE,
   RESET_STATE,
+  PATCH_PASSWORD,
 } from '../ActionCreators/actionString';
 
 import {ActionType} from 'redux-promise-middleware';
@@ -12,7 +15,7 @@ const defaultState = {
   isFulfilled: false,
   isRejected: false,
   error: '',
-  data: [],
+  data: {},
   status: '',
 };
 
@@ -81,6 +84,70 @@ const userReducer = (prevstate = defaultState, action) => {
         ...prevstate,
         isPending: false,
         isFulfilled: true,
+      };
+    case GET_PROFILE.concat('_', Pending):
+      return {
+        ...prevstate,
+        isPending: true,
+        isFulfilled: false,
+        isRejected: false,
+      };
+    case GET_PROFILE.concat('_', Rejected):
+      return {
+        ...prevstate,
+        isPending: false,
+        isRejected: true,
+        error: action.payload,
+      };
+    case GET_PROFILE.concat('_', Fulfilled):
+      return {
+        ...prevstate,
+        isPending: false,
+        isFulfilled: true,
+        data: action.payload.data.result,
+      };
+    case PATCH_PROFILE.concat('_', Pending):
+      return {
+        ...prevstate,
+        isPending: true,
+        isFulfilled: false,
+        isRejected: false,
+      };
+    case PATCH_PROFILE.concat('_', Rejected):
+      return {
+        ...prevstate,
+        isPending: false,
+        isRejected: true,
+        error: action.payload,
+      };
+    case PATCH_PROFILE.concat('_', Fulfilled):
+      return {
+        ...prevstate,
+        isPending: false,
+        isFulfilled: true,
+        data: action.payload.data.result,
+      };
+    case PATCH_PASSWORD.concat('_', Pending):
+      return {
+        ...prevstate,
+        isPending: true,
+        isFulfilled: false,
+        isRejected: false,
+      };
+    case PATCH_PASSWORD.concat('_', Rejected):
+      return {
+        ...prevstate,
+        isPending: false,
+        isRejected: true,
+        status: action.payload.response.status,
+        error: action.payload,
+      };
+    case PATCH_PASSWORD.concat('_', Fulfilled):
+      return {
+        ...prevstate,
+        isPending: false,
+        isFulfilled: true,
+        status: action.payload.status,
       };
     case RESET_STATE:
       return {

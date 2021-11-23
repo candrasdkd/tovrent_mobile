@@ -11,7 +11,7 @@ import historyReducer from './Reducers/history';
 const authPersistConfig = {
   key: 'auth',
   storage: AsyncStorage,
-  whitelist: ['token', 'userInfo', 'data'],
+  whitelist: ['token', 'userInfo'],
 };
 
 // const vehiclePersistConfig = {

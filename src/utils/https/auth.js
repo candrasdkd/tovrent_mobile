@@ -4,31 +4,31 @@ import {API_URL} from '@env';
 
 // const url = process.env.REACT_APP_BASE_URL;
 export const postRegister = body => {
-  return Axios.post(`${API_URL}auth/register`, body);
+  return Axios.post(`${API_URL}/auth/register`, body);
 };
 
 export const postLogin = body => {
-  return Axios.post(`${API_URL}auth/login`, body);
+  return Axios.post(`${API_URL}/auth/login`, body);
 };
 
 export const getProfile = (params, token) => {
-  return Axios.get(`${API_URL}users/${params}`, {
+  return Axios.get(`${API_URL}/users/${params}`, {
     headers: {'x-access-token': `Bearer ${token}`},
   });
 };
 
 export const patchPassword = (params, body, token) => {
-  return Axios.patch(`${API_URL}users/password/${params}`, body, {
+  return Axios.patch(`${API_URL}/users/password/${params}`, body, {
     headers: {'x-access-token': `Bearer ${token}`},
   });
 };
 
 export const patchProfile = (params, body, token) => {
-  return Axios.patch(`${API_URL}users/${params}`, body, {
+  return Axios.patch(`${API_URL}/users/${params}`, body, {
     headers: {'x-access-token': `Bearer ${token}`},
   });
 };
 
 export const deleteLogout = token => {
-  return Axios.delete(`${API_URL}auth/logout`, {token: token});
+  return Axios.delete(`${API_URL}/auth/logout`, {token: token});
 };

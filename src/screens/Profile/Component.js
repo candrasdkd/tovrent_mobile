@@ -5,12 +5,17 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
+  ToastAndroid,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {API_URL} from '@env';
 import {connect} from 'react-redux';
 import styles from './Style';
-import {profileAction, logoutAction} from '../../redux/ActionCreators/auth';
+import {logoutAction} from '../../redux/ActionCreators/auth';
+import {
+  getProfileAction,
+  resetStateAction,
+} from '../../redux/ActionCreators/user';
 import Modal from '../../components/ModalScreen/Component';
 
 class Profile extends React.Component {
@@ -31,43 +36,78 @@ class Profile extends React.Component {
 
   logoutHandler = () => {
     const token = this.props.auth.token;
+    const reduxAuth = this.props.user.data;
     this.props.logout(token);
+    if (reduxAuth.isFulfilled) {
+    }
+    this.props.navigation.replace('login');
+    ToastAndroid.show('Logout has success', ToastAndroid.SHORT);
   };
 
-  submitModal = () => {
+  submitHandler = () => {
     this.logoutHandler();
     this.hideModal();
   };
 
   componentDidMount() {
-    const params = this.props.auth.userInfo.userId;
-    const token = this.props.auth.token;
-    if (!this.props.auth.token) {
-      this.props.navigation.replace('login');
-    } else {
-      this.props.urlGet(params, token);
-    }
+    this._unsubscribe = this.props.navigation.addListener('focus', () => {
+      const token = this.props.auth.token;
+      const reduxAuth = this.props.auth.userInfo;
+      if (!token) {
+        this.props.navigation.replace('login');
+      }
+      if (token) {
+        this.props.getProfile(reduxAuth.id, token);
+        this.props.resetState();
+        // setTimeout(() => {
+        //   this.props.resetState();
+        // }, 1000);
+      }
+      if (this.props.user.isFulfilled) {
+      }
+    });
   }
-  componentDidUpdate() {
-    if (this.props.auth.token === '') {
-      this.props.navigation.replace('home');
-    } 
+  componentWillUnmount() {
+    this._unsubscribe();
   }
+
   render() {
+    const reduxUser = this.props.user?.data;
+    const {modalVisible} = this.state;
+    const {showModal, hideModal, submitHandler} = this;
+    const {
+      image,
+      fullName,
+      email,
+      gender,
+      phoneNumber,
+      address,
+      DOB,
+      cardNumber,
+    } = reduxUser;
     return (
       <>
-        {this.props.auth.userInfo ? (
+        {reduxUser ? (
           <View>
             <View style={styles.container}>
               <TouchableOpacity
-                onPress={() => this.props.navigation.navigate('edit-profile')}>
-                {this.props.auth.userInfo.userImage ? (
+                onPress={() =>
+                  this.props.navigation.navigate('edit-profile', {
+                    image,
+                    fullName,
+                    email,
+                    gender,
+                    phoneNumber,
+                    address,
+                    DOB,
+                    cardNumber,
+                  })
+                }>
+                {image ? (
                   <Image
                     style={styles.imageProfile}
                     source={{
-                      uri: `${API_URL}${
-                        this.props.auth.userInfo?.userImage.split(',')[0]
-                      }`,
+                      uri: `${API_URL}${image.split(',')[0]}`,
                     }}
                   />
                 ) : (
@@ -76,12 +116,13 @@ class Profile extends React.Component {
                     source={require('../../../assets/images/default-pp.png')}
                   />
                 )}
+                <Text style={styles.textEditImage}>+</Text>
               </TouchableOpacity>
               <Text style={styles.titleProfile}>
-                {this.props.auth.userInfo.userName}
+                {fullName ? fullName : email}
               </Text>
-              <Text> {this.props.auth.userInfo?.userEmail}</Text>
-              <Text>{this.props.auth.userInfo?.userPhone}</Text>
+              <Text> {email}</Text>
+              <Text>{phoneNumber}</Text>
             </View>
             <View style={styles.menuContainer}>
               <TouchableOpacity
@@ -107,14 +148,14 @@ class Profile extends React.Component {
                   Update password
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={this.showModal}>
+              <TouchableOpacity onPress={showModal}>
                 <Text style={styles.textMenu}>Log out</Text>
               </TouchableOpacity>
               <Modal
-                modalVisible={this.state.modalVisible}
-                hideModal={this.hideModal}
+                modalVisible={modalVisible}
+                hideModal={hideModal}
                 text={'Do you want to Logout?'}
-                submitHandler={this.submitModal}
+                submitHandler={submitHandler}
               />
             </View>
           </View>
@@ -127,19 +168,23 @@ class Profile extends React.Component {
     );
   }
 }
-const mapStateToProps = ({auth}) => {
+const mapStateToProps = ({auth, user}) => {
   return {
     auth,
+    user,
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    urlGet: (params, token) => {
-      dispatch(profileAction(params, token));
+    getProfile: (params, token) => {
+      dispatch(getProfileAction(params, token));
     },
     logout: token => {
       dispatch(logoutAction(token));
+    },
+    resetState: body => {
+      dispatch(resetStateAction(body));
     },
   };
 };

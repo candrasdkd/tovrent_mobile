@@ -24,7 +24,7 @@ class History extends React.Component {
       const params = this.props.auth.userInfo.Id;
       const token = this.props.auth.token;
       if (!token) {
-        this.props.navigation.navigate('login');
+        this.props.navigation.replace('login');
       } else {
         if (this.props.auth.userInfo.statusLevel === 3) {
           this.props.historyUser(params, token);

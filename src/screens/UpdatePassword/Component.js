@@ -4,132 +4,186 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ActivityIndicator,
   ToastAndroid,
   Image,
 } from 'react-native';
 import {connect} from 'react-redux';
 import styles from './style';
-import {patchPasswordAction} from '../../redux/ActionCreators/auth';
+import {patchPasswordAction} from '../../redux/ActionCreators/user';
 import ModalScreen from '../../components/ModalScreen/Component';
 import Header from '../../components/IconHeader/Component';
+import ModalError from '../../components/ModalError/Component';
 
 class Component extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      open: false,
+      // open: false,
       oldPass: '',
       newPass: '',
-      showMessage: false,
+      confirmNewPass: '',
       errorMessage: '',
-      openModalUpload: false,
-      openModalScreen: false,
-      modalVisible: false,
+      showMessage: false,
+      openModal: false,
+      // openModalScreen: false,
+      // modalVisible: false,
     };
   }
-  showModalUpload = () => {
-    this.setState({openModalUpload: true});
-  };
-  hideModalUpload = () => {
-    this.setState({openModalUpload: false});
-  };
-  showModalScreen = () => {
-    this.setState({openModalScreen: true});
-  };
-  hideModalScreen = () => {
-    this.setState({openModalScreen: false});
-  };
-  setOldPassword = value => {
-    this.setState({oldPass: value});
-  };
-  setNewPassword = value => {
-    this.setState({newPass: value});
-  };
 
-  updateHandler = () => {
+  onSubmit = () => {
+    if (this.state.oldPass.length < 1) {
+      return this.setState({
+        showMessage: true,
+        errorMessage: 'Old password must fill!',
+      });
+    }
     if (this.state.oldPass.length < 6) {
       return this.setState({
         showMessage: true,
-        errorMessage: 'Password must have min 6 character!',
+        errorMessage: 'Old password must have min 6 character!',
       });
     }
-    const data = {
-      id: this.props.auth.userInfo.Id,
+    if (this.state.oldPass.length < 1) {
+      return this.setState({
+        showMessage: true,
+        errorMessage: 'New password must fill!',
+      });
+    }
+    if (this.state.oldPass.length < 6) {
+      return this.setState({
+        showMessage: true,
+        errorMessage: 'New password must have min 6 character!',
+      });
+    }
+    if (this.state.oldPass.length < 1) {
+      return this.setState({
+        showMessage: true,
+        errorMessage: 'Confirm new password must fill!',
+      });
+    }
+    if (this.state.newPass === this.state.oldPass) {
+      return this.setState({
+        showMessage: true,
+        errorMessage: 'New password must different!',
+      });
+    }
+
+    if (this.state.newPass !== this.state.confirmNewPass) {
+      return this.setState({
+        showMessage: true,
+        errorMessage: 'Confirm new password not match!',
+      });
+    }
+    if (this.state.showMessage === false) {
+      this.setState({openModal: true});
+    }
+  };
+
+  submitModal = () => {
+    const body = {
+      id: this.props.auth.userInfo.id,
       oldPass: this.state.oldPass,
       newPass: this.state.newPass,
     };
     const token = this.props.auth.token;
-    this.props.updatePassword(this.props.auth.userInfo.Id, data, token);
-    ToastAndroid.show('Password has Updated!', ToastAndroid.SHORT);
+    this.props.updatePassword(this.props.auth.userInfo.id, body, token);
+    this.setState({openModal: false});
   };
 
-  submitHandler = () => {
-    this.updateHandler();
-    this.hideModalScreen();
+  oldPassError = () => {
+    this.setState({
+      showMessage: true,
+      errorMessage: 'Confirm new password not match!',
+    });
   };
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.user.status === 200) {
+      this.props.navigation.navigate('ProfileScreen');
+      ToastAndroid.show('Password has Updated!', ToastAndroid.SHORT);
+    }
+    // if (prevProps.status === prevState.404) {
+    //   this.oldPassError();
+    // }
+  }
   render() {
-    // console.log(this.props.auth.data[0].userIdCard)
     const {
-      showModalScreen,
-      hideModalScreen,
-      setNewPassword,
-      setOldPassword,
-      submitHandler,
-    } = this;
+      oldPass,
+      newPass,
+      confirmNewPass,
+      openModal,
+      showMessage,
+      errorMessage,
+    } = this.state;
+    const {submitModal, onSubmit} = this;
     return (
       <>
-        {this.props.auth.data.length ? (
-          <View>
-            <Header text="Update Password" />
-            <View style={styles.textView}>
-              <Image
-                style={styles.imageProfile}
-                source={require('../../../assets/images/pw.png')}
-              />
-              <Text style={styles.text}>Old Password : </Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Please input your old password"
-                placeholderTextColor="#393939"
-                secureTextEntry={true}
-                onChangeText={value => setOldPassword(value)}
-              />
-              <Text style={styles.text}>New Password : </Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Please input your new password"
-                placeholderTextColor="#393939"
-                secureTextEntry={true}
-                onChangeText={value => setNewPassword(value)}
-              />
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={styles.button}
-                onPress={showModalScreen}>
-                <Text style={styles.textButton}>Change Password</Text>
-              </TouchableOpacity>
-              <ModalScreen
-                modalVisible={this.state.openModalScreen}
-                hideModal={hideModalScreen}
-                text="Are you sure update password?"
-                submitHandler={submitHandler}
-              />
-            </View>
+        <View>
+          <Header
+            text="Update Password"
+            route={() => this.props.navigation.goBack('ProfileScreen')}
+          />
+          <View style={styles.textView}>
+            <Image
+              style={styles.imageProfile}
+              source={require('../../../assets/images/pw.png')}
+            />
+            <Text style={styles.text}>Old Password : </Text>
+            <TextInput
+              style={styles.input}
+              placeholderTextColor={oldPass ? '#393939' : '#888888'}
+              placeholder={'Input your old password'}
+              secureTextEntry={true}
+              onChangeText={value => this.setState({oldPass: value})}
+            />
+            <Text style={styles.text}>New Password : </Text>
+            <TextInput
+              style={styles.input}
+              placeholderTextColor={newPass ? '#393939' : '#888888'}
+              placeholder={'Input your new password'}
+              secureTextEntry={true}
+              onChangeText={value => this.setState({newPass: value})}
+            />
+            <Text style={styles.text}>Confirm new password : </Text>
+            <TextInput
+              style={styles.input}
+              placeholderTextColor={confirmNewPass ? '#393939' : '#888888'}
+              placeholder={'Input new password to confirm'}
+              secureTextEntry={true}
+              onChangeText={value => this.setState({confirmNewPass: value})}
+            />
+
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={styles.button}
+              onPress={onSubmit}>
+              <Text style={styles.textButton}>Confirm</Text>
+            </TouchableOpacity>
+
+            <ModalError
+              modalVisible={showMessage}
+              hideModal={() => this.setState({showMessage: false})}
+              error={errorMessage}
+              // submitHandler={submitHandler}
+            />
+
+            <ModalScreen
+              modalVisible={openModal}
+              hideModal={() => this.setState({openModal: false})}
+              text="Are you sure update password?"
+              submitHandler={submitModal}
+            />
           </View>
-        ) : (
-          <View style={styles.loading}>
-            <ActivityIndicator size="large" />
-          </View>
-        )}
+        </View>
       </>
     );
   }
 }
 
-const mapStateToProps = ({auth}) => {
+const mapStateToProps = ({auth, user}) => {
   return {
     auth,
+    user,
   };
 };
 
