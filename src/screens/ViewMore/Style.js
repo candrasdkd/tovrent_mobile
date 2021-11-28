@@ -8,18 +8,16 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  cardWrapper: {
-    marginHorizontal: 25,
-    marginVertical: 15,
-  },
   card: {
     width: 120,
     height: 105,
     borderRadius: 20,
   },
-  itemMenu: {
+  item: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginHorizontal: 25,
+    marginVertical: 12,
   },
   rating: {
     width: 50,
@@ -34,11 +32,15 @@ export default StyleSheet.create({
     backgroundColor: 'rgb(245, 164, 42)',
     borderRadius: 40,
   },
+  text: {
+    paddingLeft: 25,
+  },
   titleText: {
     fontFamily: 'Nunito-Reguler',
     fontSize: 14,
     fontWeight: 'bold',
     color: '#393939',
+    width: 180,
   },
   subtitleText: {
     fontFamily: 'Nunito-Reguler',

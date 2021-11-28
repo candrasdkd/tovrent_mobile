@@ -1,9 +1,6 @@
 export const SIGN_IN = 'SIGN_IN';
 export const SIGN_OUT = 'SIGN_OUT';
 export const REGISTER = 'REGISTER';
-export const GET_VEHICLES_CARS = 'GET_VEHICLES_CARS';
-export const GET_VEHICLES_MOTORBIKE = 'GET_VEHICLES_MOTORBIKE';
-export const GET_VEHICLES_BIKE = 'GET_VEHICLES_BIKE';
 export const GET_VEHICLES_ID = 'GET_VEHICLES_ID';
 export const POST_VEHICLES = 'POST_VEHICLES';
 export const PATCH_VEHICLES = 'PATCH_VEHICLES';

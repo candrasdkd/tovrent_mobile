@@ -14,21 +14,26 @@ export default StyleSheet.create({
   },
   filter: {
     fontSize: 16,
-    borderBottomWidth: 1,
+    marginVertical: 10,
+    paddingVertical: 10,
+    paddingLeft: 20,
+    paddingRight: 50,
+    borderWidth: 2,
+    borderColor: '#F5F5F5',
   },
   searchIcon: {
     position: 'absolute',
     right: 20,
     top: 10,
     fontSize: 25,
-    color: '#fff',
+    color: '#000',
   },
   input: {
     width: '100%',
     paddingLeft: 20,
     paddingRight: 50,
-    backgroundColor: 'rgba(96, 98, 102, 0.5)',
-    color: '#fff',
+    backgroundColor: '#DFDEDE',
+    color: '#000',
     borderRadius: 10,
   },
   cardWrapper: {
@@ -62,6 +67,7 @@ export default StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     color: '#393939',
+    width: 180,
   },
   subtitleText: {
     fontFamily: 'Nunito-Reguler',
@@ -80,5 +86,10 @@ export default StyleSheet.create({
     fontSize: 14,
     color: '#393939',
     marginVertical: 10,
+  },
+  errorView: {flex: 1, flexDirection: 'column', justifyContent: 'center'},
+  errorText: {
+    fontSize: 20,
+    textAlign: 'center',
   },
 });

@@ -3,7 +3,7 @@ import styles from './Style';
 import {API_URL} from '@env';
 import {connect} from 'react-redux';
 import IconHeader from '../../components/IconHeader/Component';
-import {getVehicleAction} from '../../redux/ActionCreators/vehicle';
+import {getVehicles} from '../../utils/https/vehicle';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Axios from 'axios';
 
@@ -27,9 +27,8 @@ class ViewMore extends React.Component {
 
   componentDidMount() {
     const {query} = this.props.route.params;
-    Axios.get(`${API_URL}vehicles/${query}`)
+    getVehicles(query)
       .then(({data}) => {
-        console.log(data);
         this.setState({
           data: data.result.data,
           nextPage: data.result.nextPage,
@@ -53,9 +52,10 @@ class ViewMore extends React.Component {
               data={this.state.data}
               renderItem={({item: vehicle}) => {
                 return (
-                  <View style={styles.itemMenu}>
+                  <>
                     <TouchableOpacity
-                      style={styles.cardWrapper}
+                      style={styles.item}
+                      activeOpacity={0.5}
                       onPress={() =>
                         this.props.navigation.navigate('reservation', {
                           itemId: vehicle.id,
@@ -65,40 +65,48 @@ class ViewMore extends React.Component {
                           itemAddress: vehicle.address,
                         })
                       }>
-                      <Image
-                        style={styles.card}
-                        source={{
-                          uri: `${API_URL}${vehicle.picture.split(',')[0]}`,
-                        }}
-                      />
+                      <View style={styles.shadow}>
+                        <Image
+                          style={styles.card}
+                          source={{
+                            uri: `${API_URL}${vehicle.picture.split(',')[0]}`,
+                          }}
+                        />
+                        <Text style={styles.rating}>
+                          4.5
+                          <Icon name="star" color="#fff" size={14} />
+                        </Text>
+                      </View>
 
-                      <Text style={styles.rating}>
-                        4.5
-                        <Icon name="star" color="#fff" size={14} />
-                      </Text>
+                      <View style={styles.text}>
+                        <Text
+                          style={styles.titleText}
+                          numberOfLines={1}
+                          ellipsizeMode="tail">
+                          {vehicle.name}{' '}
+                        </Text>
+                        <Text style={styles.subtitleText}>
+                          Max for {vehicle.capacity} person
+                        </Text>
+                        <Text style={styles.subtitleText}>
+                          2.1 from your location
+                        </Text>
+                        <Text style={styles.greenText}>Availabe</Text>
+                        <Text style={styles.priceText}>
+                          Rp. {Number(vehicle.price).toLocaleString('de-DE')}
+                          /day
+                        </Text>
+                      </View>
                     </TouchableOpacity>
-                    <View style={styles.textWrapper}>
-                      <Text style={styles.titleText}>{vehicle.name}</Text>
-                      <Text style={styles.subtitleText}>
-                        Max for {vehicle.capacity} person
-                      </Text>
-                      <Text style={styles.subtitleText}>
-                        2.1 from your location
-                      </Text>
-                      <Text style={styles.greenText}>Availabe</Text>
-                      <Text style={styles.priceText}>
-                        Rp. {Number(vehicle.price).toLocaleString('de-DE')}/day
-                      </Text>
-                    </View>
-                  </View>
+                  </>
                 );
               }}
               keyExtractor={(_, index) => index}
               onEndReached={() => {
                 this.state.nextPage !== null &&
-                  Axios.get(API_URL + this.state.nextPage)
+                  Axios.get(`${API_URL}${this.state.nextPage}&limit=5`)
                     .then(({data}) => {
-                      console.log('pusing', data);
+                      console.log(data);
                       this.setState({
                         data: [...this.state.data, ...data.result.data],
                         nextPage: data.result.nextPage,
@@ -126,14 +134,4 @@ const mapStateToProps = ({vehicle}) => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
-  return {
-    urlVehicle: query => {
-      dispatch(getVehicleAction(query));
-    },
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ViewMore);
-
-// export default ViewMore;
+export default connect(mapStateToProps)(ViewMore);

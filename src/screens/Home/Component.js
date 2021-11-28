@@ -5,7 +5,6 @@ import {connect} from 'react-redux';
 import Card from '../../components/HomeCard/Component';
 import Axios from 'axios';
 import {API_URL} from '@env';
-// import {notifikasi} from '../../components/Notification/Component';
 import {
   View,
   StatusBar,
@@ -13,186 +12,205 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  ActivityIndicator,
   ImageBackground,
 } from 'react-native';
-// import {
-//   getVehicleAction,
-//   getBike,
-//   getCars,
-//   getMotorbike,
-// } from '../../redux/ActionCreators/vehicle';
-import {profileAction} from '../../redux/ActionCreators/auth';
+import {getVehicles} from '../../utils/https/vehicle';
 
 class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      vehicleName: '',
-      data: [],
-      cars: [],
-      motorbike: [],
-      bike: [],
-      popular: [],
-      nextPage: null,
-      nextPageCars: null,
+      keyword: '',
+      popularData: [],
+      carData: [],
+      motorbikeData: [],
+      bikeData: [],
+      nextPageCar: null,
       nextPageMotorbike: null,
       nextPageBike: null,
     };
   }
-  nameHandler = text => {
-    this.setState({vehicleName: text});
-  };
 
   searchHandler = () => {
-    const query = `?keyword=${this.state.vehicleName}`;
-    this.props.navigation.navigate('search', {sendQuery: query});
-    // if (this.props.auth.token === '') {
-    //   null;
-    // } else {
-    //   notifikasi.configure();
-    //   notifikasi.sendChannel('1');
-    //   notifikasi.notificationSchedule(
-    //     '1',
-    //     'New Diskon',
-    //     'Segera login untuk mendapatkan diskon nnya',
-    //   );
-    // }
+    this.props.navigation.navigate('search', {keyword: this.state.keyword});
   };
 
-  carsHandler = () => {
-    const query = '?type_id=1&sort=ASC&limit=10';
-    this.props.navigation.navigate('view-more', {query: query, title: 'Cars'});
+  getCarData = () => {
+    const query = {type_id: 1, limit: 4};
+    getVehicles(query).then(({data}) => {
+      this.setState({
+        carData: data.result.data,
+        nextPageCar: data.result.nextPage,
+      });
+    });
   };
 
-  motorbikeHandler = () => {
-    const query = '?type_id=2';
+  getMotorbikeData = () => {
+    const query = {type_id: 2, limit: 4};
+    getVehicles(query).then(({data}) => {
+      this.setState({
+        motorbikeData: data.result.data,
+        nextPageMotorbike: data.result.nextPage,
+      });
+    });
+  };
+
+  getBikeData = () => {
+    const query = {type_id: 3, limit: 4};
+    getVehicles(query).then(({data}) => {
+      this.setState({
+        bikeData: data.result.data,
+        nextPageBike: data.result.nextPage,
+      });
+    });
+  };
+
+  carNavigation = () => {
+    const query = {type_id: 1, limit: 5};
+    this.props.navigation.navigate('view-more', {query, title: 'Cars'});
+  };
+
+  motorbikeNavigation = () => {
+    const query = {type_id: 2, limit: 5};
     this.props.navigation.navigate('view-more', {
-      query: query,
+      query,
       title: 'Motorbike',
     });
   };
 
-  bikeHandler = () => {
-    const query = '?type_id=3';
-    this.props.navigation.navigate('view-more', {query: query, title: 'Bike'});
+  bikeNavigation = () => {
+    const query = {type_id: 3, limit: 5};
+    this.props.navigation.navigate('view-more', {query, title: 'Bike'});
   };
 
-  componentDidMount() {
-    this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      const getPerType = filter => {
-        Axios.get(`${API_URL}vehicles/?type_id=${filter}&limit=10`)
-          .then(({data}) => {
-            this.setState({data: data.result.data});
-            if (filter === 1) {
-              // console.log(data);
-              this.setState({
-                cars: data.result.data,
-                nextPageCars: data.result.nextPageCars,
-              });
-            }
-            if (filter === 2) {
-              this.setState({
-                motorbike: data.result.data,
-                nextPageMotorbike: data.result.nextPageMotorbike,
-              });
-            }
-            if (filter === 3) {
-              this.setState({
-                bike: data.result.data,
-                nextPageBike: data.result.nextPageBike,
-              });
-            }
-          })
-          .catch(err => {
-            console.log(err);
-          });
-      };
-
-      Axios.get(`${API_URL}vehicles/popular/`)
+  paginasiCar = () => {
+    if (this.state.nextPageCar !== null) {
+      Axios.get(`${API_URL}${this.state.nextPageCar}&limit=4`)
         .then(({data}) => {
           this.setState({
-            popular: data.result.data,
-            nextPage: data.result.nextPage,
+            carData: [...this.state.carData, ...data.result.data],
+            nextPageCar: data.result.nextPage,
           });
         })
         .catch(err => {
           console.log(err);
         });
-      getPerType(1);
-      getPerType(2);
-      getPerType(3);
-      // this.props.urlCars();
-      // this.props.urlMotorbike();
-      // this.props.urlBike();
+    }
+  };
+
+  paginasiMotorbike = () => {
+    if (this.state.nextPageMotorbike !== null) {
+      Axios.get(`${API_URL}${this.state.nextPageMotorbike}&limit=4`)
+        .then(({data}) => {
+          this.setState({
+            motorbikeData: [...this.state.motorbikeData, ...data.result.data],
+            nextPageMotorbike: data.result.nextPage,
+          });
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
+  };
+
+  paginasiBike = () => {
+    if (this.state.nextPageBike !== null) {
+      Axios.get(`${API_URL}${this.state.nextPageBike}&limit=4`)
+        .then(({data}) => {
+          this.setState({
+            bikeData: [...this.state.bikeData, ...data.result.data],
+            nextPageBike: data.result.nextPage,
+          });
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
+  };
+
+  componentDidMount() {
+    this.unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.getCarData();
+      this.getMotorbikeData();
+      this.getBikeData();
+      this.paginasiCar();
+      this.paginasiMotorbike();
+      this.paginasiBike();
     });
   }
+
   componentWillUnmount() {
-    this._unsubscribe();
+    this.unsubscribe();
   }
+
   render() {
+    const {
+      searchHandler,
+      carNavigation,
+      motorbikeNavigation,
+      bikeNavigation,
+      paginasiCar,
+      paginasiMotorbike,
+      paginasiBike,
+    } = this;
+    const {popularData, carData, motorbikeData, bikeData} = this.state;
     return (
       <>
         <StatusBar hidden={true} />
-        {this.state.data ? (
-          <ScrollView style={styles.scrollContainer}>
-            <ImageBackground
-              style={styles.bgHome}
-              source={require('../../../assets/images/bg-home.png')}>
-              <View style={styles.backgroundHeader}>
-                <View style={styles.searchSection}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Search Vehicle"
-                    placeholderTextColor="#fff"
-                    keyboardType={'email-address'}
-                    onChangeText={this.nameHandler}
-                  />
-                  <Icon
-                    name="search-outline"
-                    style={styles.searchIcon}
-                    onPress={this.searchHandler}
-                  />
-                </View>
+        <ScrollView style={styles.scrollContainer}>
+          <ImageBackground
+            style={styles.bgHome}
+            source={require('../../../assets/images/bg-home.png')}>
+            <View style={styles.backgroundHeader}>
+              <View style={styles.searchSection}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Search Vehicle"
+                  placeholderTextColor="#fff"
+                  keyboardType="default"
+                  returnKeyType="search"
+                  onSubmitEditing={searchHandler}
+                  onChangeText={value => this.setState({keyword: value})}
+                />
+                <Icon name="search-outline" style={styles.searchIcon} />
               </View>
-            </ImageBackground>
-            {this.props.auth.userInfo.statusLevel === 1 ||
-              (this.props.auth.userInfo.statusLevel === 2 && (
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  style={styles.button}
-                  onPress={() => this.props.navigation.navigate('add-vehicle')}>
-                  <Text style={styles.textButton} onPress={this.saveHandler}>
-                    Add Vehicle
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            <Card
-              title="Popular"
-              vehicleData={this.state.popular}
-              pressHandler={this.bikeHandler}
-            />
-            <Card
-              title="Cars"
-              vehicleData={this.state.cars}
-              pressHandler={this.carsHandler}
-            />
-            <Card
-              title="Motorbike"
-              vehicleData={this.state.motorbike}
-              pressHandler={this.motorbikeHandler}
-            />
-            <Card
-              title="Bike"
-              vehicleData={this.state.bike}
-              pressHandler={this.bikeHandler}
-            />
-          </ScrollView>
-        ) : (
-          <View style={styles.loading}>
-            <ActivityIndicator size="large" />
-          </View>
-        )}
+            </View>
+          </ImageBackground>
+          {this.props.auth.userInfo.statusLevel === 1 ||
+            (this.props.auth.userInfo.statusLevel === 2 && (
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={styles.button}
+                onPress={() => this.props.navigation.navigate('add-vehicle')}>
+                <Text style={styles.textButton}>Add Vehicle</Text>
+              </TouchableOpacity>
+            ))}
+          <Card
+            title="Popular"
+            vehicleData={popularData}
+            pressHandler={carNavigation}
+            paginasi={paginasiCar}
+          />
+          <Card
+            title="Cars"
+            vehicleData={carData}
+            pressHandler={carNavigation}
+            paginasi={paginasiCar}
+          />
+
+          <Card
+            title="Motorbike"
+            vehicleData={motorbikeData}
+            pressHandler={motorbikeNavigation}
+            paginasi={paginasiMotorbike}
+          />
+          <Card
+            title="Bike"
+            vehicleData={bikeData}
+            pressHandler={bikeNavigation}
+            paginasi={paginasiBike}
+          />
+        </ScrollView>
       </>
     );
   }
@@ -218,9 +236,6 @@ const mapDispatchToProps = dispatch => {
     // urlBike: () => {
     //   dispatch(getBike());
     // },
-    getProfile: (params, token) => {
-      dispatch(profileAction(params, token));
-    },
   };
 };
 

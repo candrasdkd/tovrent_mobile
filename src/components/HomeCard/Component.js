@@ -1,15 +1,19 @@
 import React from 'react';
-import {View, Text, Image, TouchableOpacity, FlatList} from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  FlatList,
+  Pressable,
+  ActivityIndicator,
+} from 'react-native';
 import styles from './Style';
 import {API_URL} from '@env';
 import {useNavigation} from '@react-navigation/native';
-// import Axios from 'axios';
 
-const Component = props => {
-  const {title, vehicleData, pressHandler} = props;
-
+const HomeCard = props => {
+  const {title, vehicleData, pressHandler, paginasi} = props;
   const navigation = useNavigation();
-
   return (
     <View>
       <View style={styles.textContainer}>
@@ -18,45 +22,43 @@ const Component = props => {
           View More {'>'}
         </Text>
       </View>
-      <FlatList
-        horizontal={true}
-        data={vehicleData}
-        renderItem={({item: vehicle}) => {
-          return (
-            <View style={styles.cardContainer}>
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate('reservation', {
-                    itemId: vehicle.id,
-                  })
-                }>
-                <Image
-                  style={styles.card}
-                  source={{
-                    uri: `${API_URL}${vehicle.picture.split(',')[0]}`,
-                  }}
-                />
-              </TouchableOpacity>
-            </View>
-          );
-        }}
-        keyExtractor={(_, index) => index}
-        // onEndReached={
-        //   pageVehicle !== null &&
-        //   Axios.get(API_URL + pageVehicle)
-        //     .then(({data}) => {
-        //       console.log(data);
-        //       setPageVehicle(data.result.nextPage);
-        //       return setdataPaginasi([...dataPaginasi, ...data.result.data]);
-        //     })
-        //     .catch(err => {
-        //       console.log(err);
-        //     })
-
-        // onEndReachedThreshold={0.1}
-      />
+      {vehicleData.length === 0 && (
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" />
+        </View>
+      )}
+      {vehicleData.length > 0 && (
+        <FlatList
+          horizontal={true}
+          data={vehicleData}
+          renderItem={({item: vehicle}) => {
+            return (
+              <View style={styles.cardContainer}>
+                <Pressable
+                  onPress={() =>
+                    navigation.navigate('reservation', {
+                      itemId: vehicle.id,
+                    })
+                  }>
+                  <View style={styles.shadow}>
+                    <Image
+                      style={styles.card}
+                      resizeMode={'cover'}
+                      source={{
+                        uri: `${API_URL}${vehicle.picture.split(',')[0]}`,
+                      }}
+                    />
+                  </View>
+                </Pressable>
+              </View>
+            );
+          }}
+          keyExtractor={(_, index) => index}
+          onEndReached={paginasi}
+        />
+      )}
     </View>
   );
 };
 
-export default Component;
+export default HomeCard;
