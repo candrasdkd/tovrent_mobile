@@ -3,7 +3,7 @@ import styles from './Style';
 import {API_URL} from '@env';
 import {connect} from 'react-redux';
 import IconHeader from '../../components/IconHeader/Component';
-import {getVehicles} from '../../utils/https/vehicle';
+import {getVehicles, getPopular} from '../../utils/https/vehicle';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Axios from 'axios';
 
@@ -27,16 +27,29 @@ class ViewMore extends React.Component {
 
   componentDidMount() {
     const {query} = this.props.route.params;
-    getVehicles(query)
-      .then(({data}) => {
-        this.setState({
-          data: data.result.data,
-          nextPage: data.result.nextPage,
+    if (this.props.route.params.title === 'Popular') {
+      getPopular(query)
+        .then(({data}) => {
+          this.setState({
+            data: data.result.data,
+            nextPage: data.result.nextPage,
+          });
+        })
+        .catch(err => {
+          console.log(err);
         });
-      })
-      .catch(err => {
-        console.log(err);
-      });
+    } else {
+      getVehicles(query)
+        .then(({data}) => {
+          this.setState({
+            data: data.result.data,
+            nextPage: data.result.nextPage,
+          });
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
   }
   render() {
     const {title} = this.props.route.params;

@@ -6,7 +6,9 @@ import {API_URL} from '@env';
 export const getVehicles = params => {
   return Axios.get(`${API_URL}/vehicles`, {params: params});
 };
-
+export const getPopular = params => {
+  return Axios.get(`${API_URL}/vehicles/popular`, {params: params});
+};
 export const getVehicleById = params => {
   return Axios.get(`${API_URL}/vehicles/${params}`);
 };

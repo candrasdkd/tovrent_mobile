@@ -28,14 +28,20 @@ class Component extends React.Component {
       image: '',
       showMessage: false,
       errorMessage: '',
-      name: this.props.vehicle.dataById[0].name,
-      price: this.props.vehicle.dataById[0].price,
-      picture: this.props.vehicle.dataById[0].picture.split(',')[0],
-      amount: this.props.vehicle.dataById[0].quantity,
-      capacity: this.props.vehicle.dataById[0].capacity,
-      address: this.props.vehicle.dataById[0].address,
-      changeLocation: null,
-      location: this.props.vehicle.dataById[0].location_id,
+      name: this.props.route.params ? this.props.route.params.name : null,
+      price: this.props.route.params ? this.props.route.params.price : null,
+      picture: this.props.route.params ? this.props.route.params.image : null,
+      amount: this.props.route.params ? this.props.route.params.quantity : null,
+      capacity: this.props.route.params
+        ? this.props.route.params.capacity
+        : null,
+      address: this.props.route.params ? this.props.route.params.address : null,
+      changeLocation: this.props.route.params
+        ? this.props.route.params.city_id
+        : null,
+      location: this.props.route.params
+        ? this.props.route.params.city_id
+        : null,
     };
   }
 
@@ -44,11 +50,15 @@ class Component extends React.Component {
       width: 400,
       height: 300,
       cropping: true,
-    }).then(image => {
-      // console.log('result image=>', image, image.path);
-      this.setState({image: image});
-      // this.setState({picture: image.path});
-    });
+    })
+      .then(image => {
+        this.setState({image: image});
+      })
+      .catch(e => {
+        if (e.code === 'E_PICKER_CANCELLED') {
+          ToastAndroid.show('Selected has cancel', ToastAndroid.SHORT);
+        }
+      });
   };
 
   chooseCamera = () => {
@@ -56,57 +66,48 @@ class Component extends React.Component {
       width: 400,
       height: 300,
       cropping: true,
-    }).then(image => {
-      // console.log('result image=>', image, image.path);
-      this.setState({image: image});
-      // this.setState({picture: image.path});
-    });
+    })
+      .then(image => {
+        this.setState({image: image});
+      })
+      .catch(e => {
+        if (e.code === 'E_PICKER_CANCELLED') {
+          ToastAndroid.show('Selected has cancel', ToastAndroid.SHORT);
+        }
+      });
   };
-  showModalError = () => {
-    this.setState({showMessage: true});
-  };
-  hideModalError = () => {
-    this.setState({showMessage: false});
-  };
-  showModal = () => {
-    this.setState({modalVisible: true});
-  };
-  hideModal = () => {
-    this.setState({modalVisible: false});
-  };
-  setName = value => {
-    this.setState({name: value});
-  };
-  setPrice = value => {
-    this.setState({price: value});
-  };
-  setAddress = value => {
-    this.setState({address: value});
-  };
-  setLocation = value => {
-    this.setState({changeLocation: value});
-  };
-  setCapacity = value => {
-    this.setState({capacity: value});
-  };
-  incrementCount = () => {
-    this.setState({
-      amount: this.state.amount + 1,
-    });
-  };
-  decrementCount = () => {
-    this.setState({
-      amount: this.state.amount - 1,
-    });
-  };
+
   saveHandler = () => {
+    const params = this.props.route.params.id;
+    const token = this.props.auth.token;
+    const form = new FormData();
+    if (this.state.image === '') {
+      form.append('picture', this.state.picture);
+    } else {
+      form.append('picture', {
+        name: this.state.image.path,
+        uri: this.state.image.path,
+        type: this.state.image.mime,
+      });
+    }
+    form.append('name', this.state.name);
+    form.append('price', this.state.price);
+    form.append('capacity', this.state.capacity);
+    form.append('address', this.state.address);
+    form.append('quantity', this.state.amount);
+    form.append('city_id', this.state.changeLocation);
+    this.props.updateVehicle(params, form, token);
+    this.props.navigation.navigate('reservation', {itemId: params});
+    ToastAndroid.show('Vehicle Updated!', ToastAndroid.SHORT);
+  };
+  errorHandler = () => {
     if (this.state.name.length < 1) {
       return this.setState({
         showMessage: true,
         errorMessage: 'Name is required !',
       });
     }
-    if (!this.state.price.length > 1) {
+    if (!this.state.price.length < 1) {
       return this.setState({
         showMessage: true,
         errorMessage: 'Price is required !',
@@ -130,54 +131,18 @@ class Component extends React.Component {
         errorMessage: 'Please input location',
       });
     }
-    const params = this.props.route.params.vehicleId;
-    const token = this.props.auth.token;
-    const form = new FormData();
-    if (this.state.image === '') {
-      form.append('picture', this.state.picture);
-    } else {
-      form.append('picture', {
-        name: this.state.image.path,
-        uri: this.state.image.path,
-        type: this.state.image.mime,
-      });
-    }
-    form.append('name', this.state.name);
-    form.append('price', this.state.price);
-    form.append('capacity', this.state.capacity);
-    form.append('address', this.state.address);
-    form.append('quantity', this.state.amount);
-    form.append('city_id', this.state.changeLocation);
-    this.props.updateVehicle(params, form, token);
-    this.props.navigation.navigate('reservation', {editId: params});
-    ToastAndroid.show('Vehicle Updated!', ToastAndroid.SHORT);
+    return this.setState({modalVisible: true});
   };
-  errorHandler = () => {
-    if (
-      this.state.name === '' ||
-      this.state.price === '' ||
-      this.state.location === null
-    ) {
-      return this.saveHandler();
-    } else {
-      return this.showModal();
-    }
-  };
+
   submitHandler = () => {
     this.saveHandler();
-    this.hideModal();
+    this.setState({modalVisible: false});
     if (this.state.showMessage === true) {
-      this.showModalError();
+      this.setState({showMessage: false});
     }
   };
-  // componentDidUpdate = () => {
-  //   const params = this.props.route.params.vehicleId;
-  //   if (!this.props.vehicle.isRejected) {
 
-  //   }
-  // };
   render() {
-    console.log(location);
     const {
       modalVisible,
       name,
@@ -192,24 +157,10 @@ class Component extends React.Component {
       showMessage,
       errorMessage,
     } = this.state;
-    const {
-      hideModalError,
-      hideModal,
-      setName,
-      setPrice,
-      setCapacity,
-      setLocation,
-      setAddress,
-      incrementCount,
-      decrementCount,
-      chooseGallery,
-      chooseCamera,
-      errorHandler,
-      submitHandler,
-    } = this;
+    const {chooseGallery, chooseCamera, errorHandler, submitHandler} = this;
     return (
       <>
-        {this.props.vehicle.dataById.length ? (
+        {this.props.route.params ? (
           <ScrollView>
             <View style={styles.body}>
               <TouchableOpacity>
@@ -221,7 +172,7 @@ class Component extends React.Component {
                 ) : (
                   <Image
                     style={styles.imagesWrapper}
-                    source={{uri: `${API_URL}${picture}`}}
+                    source={{uri: `${API_URL}${String(picture).split(',')[0]}`}}
                   />
                 )}
               </TouchableOpacity>
@@ -247,28 +198,28 @@ class Component extends React.Component {
                   style={[styles.textInput, styles.input]}
                   defaultValue={name}
                   placeholderTextColor="#393939"
-                  onChangeText={value => setName(value)}
+                  onChangeText={value => this.setState({name: value})}
                 />
                 <Text style={styles.text}>Price :</Text>
                 <TextInput
                   style={[styles.textInput, styles.input]}
-                  defaultValue={`${price}`}
+                  defaultValue={`${price.toLocaleString('de-DE')}`}
                   placeholderTextColor="#393939"
-                  onChangeText={value => setPrice(value)}
+                  onChangeText={value => this.setState({price: value})}
                 />
                 <Text style={styles.text}>Capacity :</Text>
                 <TextInput
                   style={[styles.textInput, styles.input]}
                   defaultValue={`${capacity}`}
                   placeholderTextColor="#393939"
-                  onChangeText={value => setCapacity(value)}
+                  onChangeText={value => this.setState({capacity: value})}
                 />
                 <Text style={styles.text}>Address :</Text>
                 <TextInput
                   style={[styles.textInput, styles.input]}
                   defaultValue={address}
                   placeholderTextColor="#393939"
-                  onChangeText={value => setAddress(value)}
+                  onChangeText={value => this.setState({address: value})}
                 />
                 <Text style={styles.text}>Location :</Text>
                 <View style={styles.boxSelect}>
@@ -277,7 +228,7 @@ class Component extends React.Component {
                       changeLocation !== null ? changeLocation : location
                     }
                     onValueChange={(itemValue, index) =>
-                      setLocation(itemValue)
+                      this.setState({changeLocation: itemValue})
                     }>
                     {/* <Picker.Item label="Select location" value="" /> */}
                     <Picker.Item
@@ -311,14 +262,23 @@ class Component extends React.Component {
                   <Text style={styles.textCount}>Update stock : </Text>
                   <View style={styles.countWrapper}>
                     <TouchableOpacity
-                      onPress={() => amount > 1 && decrementCount(amount - 1)}>
+                      onPress={() =>
+                        amount > 1 &&
+                        this.setState({
+                          amount: amount - 1,
+                        })
+                      }>
                       <View style={styles.buttonCount}>
                         <Text style={styles.textButtonCount}> - </Text>
                       </View>
                     </TouchableOpacity>
                     <Text style={styles.amount}>{amount}</Text>
                     <TouchableOpacity
-                      onPress={() => incrementCount(amount + 1)}>
+                      onPress={() =>
+                        this.setState({
+                          amount: amount + 1,
+                        })
+                      }>
                       <View style={styles.buttonCount}>
                         <Text style={styles.textButtonCount}>+</Text>
                       </View>
@@ -326,15 +286,14 @@ class Component extends React.Component {
                   </View>
                 </View>
               </View>
-              {this.state.showMessage === true ? (
+              {showMessage === true ? (
                 <ModalError
                   modalVisible={showMessage}
-                  hideModal={hideModalError}
+                  hideModal={() => this.setState({showMessage: false})}
                   error={errorMessage}
                   submitHandler={submitHandler}
                 />
-              ) : // <Text style={styles.errorText}>{this.state.errorMessage}</Text>
-              null}
+              ) : null}
               <TouchableOpacity
                 activeOpacity={0.7}
                 style={styles.button}
@@ -343,7 +302,7 @@ class Component extends React.Component {
               </TouchableOpacity>
               <Modal
                 modalVisible={modalVisible}
-                hideModal={hideModal}
+                hideModal={() => this.setState({modalVisible: false})}
                 text="Are you sure change data ?"
                 submitHandler={submitHandler}
               />

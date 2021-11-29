@@ -310,6 +310,14 @@ class Reservation extends React.Component {
                   onPress={() =>
                     this.props.navigation.navigate('edit-vehicle', {
                       id: data.id,
+                      name: data.name,
+                      city_id: data.cityId,
+                      city_name: data.city,
+                      address: data.address,
+                      image: data.image,
+                      price: data.price,
+                      quantity: data.quantity,
+                      capacity: data.capacity,
                     })
                   }>
                   <Text style={styles.reservationText}>Edit Item</Text>

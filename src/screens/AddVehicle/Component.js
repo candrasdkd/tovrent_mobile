@@ -29,43 +29,31 @@ class Component extends React.Component {
       address: '',
       picture: '',
       amount: 1,
-      location: null,
-      category: null,
+      location: '',
+      category: '',
       showMessage: false,
       errorMessage: '',
-      openModalUpload: false,
-      openModalScreen: false,
+      openModalCameraAndGallery: false,
+      openModalSubmit: false,
     };
   }
 
-  showModalUpload = () => {
-    this.setState({openModalUpload: true});
-  };
-  hideModalUpload = () => {
-    this.setState({openModalUpload: false});
-  };
-  showModalScreen = () => {
-    this.setState({openModalScreen: true});
-  };
-  hideModalScreen = () => {
-    this.setState({openModalScreen: false});
-  };
-  showModalError = () => {
-    this.setState({showMessage: true});
-  };
-  hideModalError = () => {
-    this.setState({showMessage: false});
-  };
   chooseGallery = () => {
     ImagePicker.openPicker({
       width: 400,
       height: 300,
       cropping: true,
-    }).then(image => {
-      // console.log('result image=>', image, image.path);
-      this.setState({image: image});
-      this.setState({picture: image.path});
-    });
+    })
+      .then(image => {
+        // console.log('result image=>', image, image.path);
+        this.setState({image: image});
+        this.setState({picture: image.path});
+      })
+      .catch(e => {
+        if (e.code === 'E_PICKER_CANCELLED') {
+          ToastAndroid.show('Selected has cancel', ToastAndroid.SHORT);
+        }
+      });
   };
 
   chooseCamera = () => {
@@ -73,48 +61,45 @@ class Component extends React.Component {
       width: 400,
       height: 300,
       cropping: true,
-    }).then(image => {
-      // console.log('result image=>', image, image.path);
-      this.setState({image: image});
-      this.setState({picture: image.path});
-    });
+    })
+      .then(image => {
+        // console.log('result image=>', image, image.path);
+        this.setState({image: image});
+        this.setState({picture: image.path});
+      })
+      .catch(e => {
+        if (e.code === 'E_PICKER_CANCELLED') {
+          ToastAndroid.show('Selected has cancel', ToastAndroid.SHORT);
+        }
+      });
   };
-  setName = value => {
-    this.setState({name: value});
-  };
-  setPrice = value => {
-    this.setState({price: value});
-  };
-  setAddress = value => {
-    this.setState({address: value});
-  };
-  setCapacity = value => {
-    this.setState({capacity: value});
-  };
-  setLocation = value => {
-    this.setState({location: value});
-  };
-  setCategory = value => {
-    this.setState({category: value});
-  };
-  incrementCount = () => {
-    this.setState({
-      amount: this.state.amount + 1,
-    });
-  };
-  decrementCount = () => {
-    this.setState({
-      amount: this.state.amount - 1,
-    });
-  };
+
   saveHandler = () => {
+    const form = new FormData();
+    const token = this.props.auth.token;
+    form.append('picture', {
+      name: this.state.image.path,
+      uri: this.state.image.path,
+      type: this.state.image.mime,
+    });
+    form.append('name', this.state.name);
+    form.append('price', this.state.price);
+    form.append('city_id', this.state.location);
+    form.append('type_id', this.state.category);
+    form.append('quantity', this.state.amount);
+    form.append('user_id', this.props.auth.userInfo.id);
+    this.props.createVehicles(form, token);
+    this.props.navigation.navigate('home');
+    ToastAndroid.show('Vehicle has added!', ToastAndroid.SHORT);
+  };
+  errorHandler = () => {
     if (this.state.name.length < 1) {
       return this.setState({
         showMessage: true,
         errorMessage: 'Name is Required !',
       });
     }
-    if (!this.state.price.length > 1) {
+    if (this.state.price.length < 1) {
       return this.setState({
         showMessage: true,
         errorMessage: 'Price is Required !',
@@ -138,53 +123,27 @@ class Component extends React.Component {
         errorMessage: 'category is Required',
       });
     }
-    const form = new FormData();
-    const token = this.props.auth.token;
-    form.append('picture', {
-      name: this.state.image.path,
-      uri: this.state.image.path,
-      type: this.state.image.mime,
-    });
-    form.append('name', this.state.name);
-    form.append('price', this.state.price);
-    form.append('city_id', this.state.location);
-    form.append('type_id', this.state.category);
-    form.append('quantity', this.state.amount);
-    form.append('user_id', this.props.auth.userInfo.Id);
-    this.props.createVehicles(form, token);
-    this.props.navigation.navigate('home');
-    ToastAndroid.show('Vehicle has added!', ToastAndroid.SHORT);
-  };
-  errorHandler = () => {
-    if (
-      this.state.name === '' ||
-      this.state.price === '' ||
-      this.state.location === null
-    ) {
-      return this.saveHandler();
-    } else {
-      return this.showModalScreen();
-    }
+    return this.setState({openModalSubmit: true});
   };
   cameraHandler = () => {
     this.chooseCamera();
-    this.hideModalUpload();
+    this.setState({openModalCameraAndGallery: false});
   };
   galleryHandler = () => {
     this.chooseGallery();
-    this.hideModalUpload();
+    this.setState({openModalCameraAndGallery: false});
   };
   submitHandler = () => {
     this.saveHandler();
-    this.hideModalScreen();
+    this.setState({openModalSubmit: false});
     if (this.state.showMessage === true) {
-      this.showModalError();
+      this.setState({showMessage: false});
     }
   };
   render() {
     const {
-      openModalUpload,
-      openModalScreen,
+      openModalCameraAndGallery,
+      openModalSubmit,
       showMessage,
       errorMessage,
       picture,
@@ -193,24 +152,7 @@ class Component extends React.Component {
       amount,
       image,
     } = this.state;
-    const {
-      showModalUpload,
-      hideModalUpload,
-      hideModalScreen,
-      hideModalError,
-      setName,
-      setPrice,
-      setAddress,
-      setCapacity,
-      setLocation,
-      setCategory,
-      incrementCount,
-      decrementCount,
-      errorHandler,
-      cameraHandler,
-      galleryHandler,
-      submitHandler,
-    } = this;
+    const {errorHandler, cameraHandler, galleryHandler, submitHandler} = this;
     return (
       <View style={styles.container}>
         <IconHeader
@@ -220,12 +162,8 @@ class Component extends React.Component {
         <ScrollView>
           <View style={styles.imageContainer}>
             <TouchableOpacity>
-              {picture !== '' ? (
-                <Image
-                  style={styles.imageProfile}
-                  source={{uri: image.path}}
-                  // onValueChange={value => setPicture(value.target.files)}
-                />
+              {picture !== null ? (
+                <Image style={styles.imageProfile} source={{uri: image.path}} />
               ) : (
                 <Image
                   style={styles.imageProfile}
@@ -234,10 +172,14 @@ class Component extends React.Component {
               )}
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.button} onPress={showModalUpload}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => this.setState({openModalCameraAndGallery: true})}>
             <ModalCamera
-              modalVisible={openModalUpload}
-              hideModal={hideModalUpload}
+              modalVisible={openModalCameraAndGallery}
+              hideModal={() =>
+                this.setState({openModalCameraAndGallery: false})
+              }
               text="Please choose upload image from :"
               cameraHandler={cameraHandler}
               galleryHandler={galleryHandler}
@@ -248,14 +190,14 @@ class Component extends React.Component {
             style={styles.input}
             placeholder="Type product name min. 30 characters"
             placeholderTextColor="#9F9F9F"
-            onEndEditing={e => setName(e.nativeEvent.text)}
+            onChangeText={value => this.setState({name: value})}
           />
           <TextInput
             style={styles.input}
             placeholder="Type product price"
             placeholderTextColor="#9F9F9F"
             keyboardType="number-pad"
-            onEndEditing={e => setPrice(e.nativeEvent.text)}
+            onChangeText={value => this.setState({price: value})}
           />
           <Text style={styles.textInput}>Capacity :</Text>
           <TextInput
@@ -263,29 +205,31 @@ class Component extends React.Component {
             placeholder="Please input max capacity vehicle"
             keyboardType="number-pad"
             placeholderTextColor="#9F9F9F"
-            onChangeText={value => setCapacity(value)}
+            onChangeText={value => this.setState({capacity: value})}
           />
           <Text style={styles.textInput}>Address :</Text>
           <TextInput
             style={styles.multiLine}
             placeholder="Please input your address"
             placeholderTextColor="#9F9F9F"
-            onChangeText={value => setAddress(value)}
+            onChangeText={value => this.setState({address: value})}
           />
-          <Text style={styles.textInput}>Description</Text>
-          <TextInput
+          {/* <Text style={styles.textInput}>Description</Text> */}
+          {/* <TextInput
             style={styles.multiLine}
             placeholder="Describe your product min. 150 characters"
             placeholderTextColor="#9F9F9F"
             multiline={true}
-            // onEndEditing={e => setModel(e.nativeEvent.textInput)}
-          />
+            onChangeText={value => this.setState({name: value})}
+          /> */}
           <Text style={styles.textInput}>Location</Text>
           <View style={styles.selectBox}>
             <Picker
               selectedValue={location}
               style={styles.textSelect}
-              onValueChange={(itemValue, index) => setLocation(itemValue)}>
+              onValueChange={(itemValue, index) =>
+                this.setState({location: itemValue})
+              }>
               <Picker.Item label="Select location" value="" />
               <Picker.Item label="Bali" value={1} />
               <Picker.Item label="Yogyakarta" value={2} />
@@ -299,7 +243,9 @@ class Component extends React.Component {
             <Picker
               selectedValue={category}
               style={styles.textSelect}
-              onValueChange={(itemValue, index) => setCategory(itemValue)}>
+              onValueChange={(itemValue, index) =>
+                this.setState({category: itemValue})
+              }>
               <Picker.Item label="Select category" value="" />
               <Picker.Item label="Cars" value={1} />
               <Picker.Item label="Motorcycle" value={2} />
@@ -310,34 +256,43 @@ class Component extends React.Component {
             <Text style={styles.textCount}>Stock : </Text>
             <View style={styles.countWrapper}>
               <TouchableOpacity
-                onPress={() => amount > 1 && decrementCount(amount - 1)}>
+                onPress={() =>
+                  amount > 1 &&
+                  this.setState({
+                    amount: amount - 1,
+                  })
+                }>
                 <View style={styles.buttonCount}>
                   <Text style={styles.textButtonCount}> - </Text>
                 </View>
               </TouchableOpacity>
               <Text style={styles.amount}>{amount}</Text>
-              <TouchableOpacity onPress={() => incrementCount(amount + 1)}>
+              <TouchableOpacity
+                onPress={() =>
+                  this.setState({
+                    amount: amount + 1,
+                  })
+                }>
                 <View style={styles.buttonCount}>
                   <Text style={styles.textButtonCount}>+</Text>
                 </View>
               </TouchableOpacity>
             </View>
           </View>
-          {this.state.showMessage === true ? (
+          {showMessage === true ? (
             <ModalError
               modalVisible={showMessage}
-              hideModal={hideModalError}
+              hideModal={() => this.setState({showMessage: false})}
               error={errorMessage}
               submitHandler={submitHandler}
             />
-          ) : // <Text style={styles.errorText}>{this.state.errorMessage}</Text>
-          null}
+          ) : null}
           <TouchableOpacity style={styles.saveButton} onPress={errorHandler}>
             <Text style={styles.saveText}> Save Product</Text>
           </TouchableOpacity>
           <ModalScreen
-            modalVisible={openModalScreen}
-            hideModal={hideModalScreen}
+            modalVisible={openModalSubmit}
+            hideModal={() => this.setState({openModalSubmit: false})}
             text="Are you sure save data?"
             submitHandler={submitHandler}
           />

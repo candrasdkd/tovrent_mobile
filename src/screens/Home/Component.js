@@ -14,7 +14,7 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from 'react-native';
-import {getVehicles} from '../../utils/https/vehicle';
+import {getVehicles, getPopular} from '../../utils/https/vehicle';
 
 class Home extends React.Component {
   constructor(props) {
@@ -25,6 +25,7 @@ class Home extends React.Component {
       carData: [],
       motorbikeData: [],
       bikeData: [],
+      nextPagePopular: null,
       nextPageCar: null,
       nextPageMotorbike: null,
       nextPageBike: null,
@@ -33,6 +34,16 @@ class Home extends React.Component {
 
   searchHandler = () => {
     this.props.navigation.navigate('search', {keyword: this.state.keyword});
+  };
+
+  getPopularData = () => {
+    const query = {limit: 4};
+    getPopular(query).then(({data}) => {
+      this.setState({
+        popularData: data.result.data,
+        nextPagePopular: data.result.nextPage,
+      });
+    });
   };
 
   getCarData = () => {
@@ -65,6 +76,11 @@ class Home extends React.Component {
     });
   };
 
+  popularNavigation = () => {
+    const query = {limit: 5};
+    this.props.navigation.navigate('view-more', {query, title: 'Popular'});
+  };
+
   carNavigation = () => {
     const query = {type_id: 1, limit: 5};
     this.props.navigation.navigate('view-more', {query, title: 'Cars'});
@@ -81,6 +97,22 @@ class Home extends React.Component {
   bikeNavigation = () => {
     const query = {type_id: 3, limit: 5};
     this.props.navigation.navigate('view-more', {query, title: 'Bike'});
+  };
+
+  paginasiPopular = () => {
+    if (this.state.nextPagePopular !== null) {
+      Axios.get(`${API_URL}${this.state.nextPagePopular}&limit=4`)
+        .then(({data}) => {
+          console.log(this.state.nextPagePopular, data);
+          this.setState({
+            popularData: [...this.state.popularData, ...data.result.data],
+            nextPagePopular: data.result.nextPage,
+          });
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
   };
 
   paginasiCar = () => {
@@ -130,9 +162,11 @@ class Home extends React.Component {
 
   componentDidMount() {
     this.unsubscribe = this.props.navigation.addListener('focus', () => {
+      this.getPopularData();
       this.getCarData();
       this.getMotorbikeData();
       this.getBikeData();
+      this.paginasiPopular();
       this.paginasiCar();
       this.paginasiMotorbike();
       this.paginasiBike();
@@ -146,9 +180,11 @@ class Home extends React.Component {
   render() {
     const {
       searchHandler,
+      popularNavigation,
       carNavigation,
       motorbikeNavigation,
       bikeNavigation,
+      paginasiPopular,
       paginasiCar,
       paginasiMotorbike,
       paginasiBike,
@@ -176,8 +212,8 @@ class Home extends React.Component {
               </View>
             </View>
           </ImageBackground>
-          {this.props.auth.userInfo.statusLevel === 1 ||
-            (this.props.auth.userInfo.statusLevel === 2 && (
+          {this.props.auth.userInfo.authLevel === 1 ||
+            (this.props.auth.userInfo.authLevel === 2 && (
               <TouchableOpacity
                 activeOpacity={0.7}
                 style={styles.button}
@@ -188,8 +224,8 @@ class Home extends React.Component {
           <Card
             title="Popular"
             vehicleData={popularData}
-            pressHandler={carNavigation}
-            paginasi={paginasiCar}
+            pressHandler={popularNavigation}
+            paginasi={paginasiPopular}
           />
           <Card
             title="Cars"
