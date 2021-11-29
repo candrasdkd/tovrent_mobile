@@ -15,15 +15,16 @@ import {API_URL} from '@env';
 import {connect} from 'react-redux';
 import {Picker} from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
-import {getVehicleByIdAction} from '../../redux/ActionCreators/vehicle';
-import {io} from 'socket.io-client';
-import ModalError from '../../components/ModalError/Component';
+// import {getVehicleByIdAction} from '../../redux/ActionCreators/vehicle';
+// import {io} from 'socket.io-client';
+import {getVehicleById} from '../../utils/https/vehicle';
 
-class Component extends React.Component {
+class Reservation extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      ReserveDate: 'Select Date',
+      data: [],
+      reserveDate: 'Select Date',
       duration: 1,
       count: 1,
       open: false,
@@ -33,55 +34,25 @@ class Component extends React.Component {
       errorMessage: '',
     };
   }
-  showModalError = () => {
-    this.setState({showMessage: true});
-  };
-  hideModalError = () => {
-    this.setState({showMessage: false});
-  };
-  setCloseDate = () => {
-    this.setState({open: false});
-  };
-  setOpenDate = () => {
-    this.setState({open: true});
-  };
-  setDuration = value => {
-    this.setState({duration: value});
-  };
-  setReserveDate = value => {
-    this.setState({ReserveDate: value});
-  };
-  incrementCount = () => {
-    this.setState({
-      count: this.state.count + 1,
-    });
-    if (this.state.count === this.props.vehicle.dataById[0].quantity) {
-      return this.setState({showMessage: true});
-    }
-  };
-  decrementCount = () => {
-    this.setState({
-      count: this.state.count - 1,
-    });
-  };
+
   // errorHandler = () => {
-  //   if (this.state.count === this.props.vehicle.dataById[0].quantity) {
+  //   if (this.state.count === passedData.quantity) {
   //     this.setState({showMessage: true});
   //   }
   // };
-  // [room] = useState(`${props.vehicle.dataById[0].id}`);
-  // [name] = useState(`${props.auth.data[0].userName}`);
+  // [room] = useState(`${props.vehicle.dataById.id}`);
+  // [name] = useState(`${props.auth.data.userName}`);
 
-  joinRoom = () => {
-    if (this.state.name !== '' && this.state.room !== '') {
-      this.socket.emit('join_room', this.state.room);
-    }
-    if (!this.props.auth.token) {
-      this.props.navigation.navigate('login');
-    } else {
-      this.props.navigation.navigate('detail-chat');
-    }
-  };
+  // joinRoom = () => {
+  //   if (this.state.name !== '' && this.state.room !== '') {
+  //     this.socket.emit('join_room', this.state.room);
+  //   }
+  //   if (!this.props.auth.token) {
+  //     this.props.navigation.navigate('login');
+  //   } else {
+  //     this.props.navigation.navigate('detail-chat');
+  //   }
+  // };
 
   addDays = (date, days) => {
     let result = new Date(date);
@@ -94,8 +65,10 @@ class Component extends React.Component {
       date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
     );
   };
+
   onPressHandler = () => {
-    if (typeof ReserveDate === 'string') {
+    const passedData = this.state.data;
+    if (this.state.reserveDate === 'Select Date') {
       return ToastAndroid.show(
         'Please select date to reserve!',
         ToastAndroid.SHORT,
@@ -103,38 +76,45 @@ class Component extends React.Component {
     }
     if (!this.props.auth.token) {
       return this.props.navigation.navigate('login');
-    } else {
+    }
+    if (this.props.auth.token) {
       return this.props.navigation.navigate('first-payment', {
-        userId: this.props.auth.userInfo.Id,
-        ownerId: this.props.vehicle.dataById[0].vehicleOwnerId,
-        itemLocation: this.props.vehicle.dataById[0].vehicleCity,
-        itemNameType: this.props.vehicle.dataById[0].vehicleNameType,
-        itemId: this.props.vehicle.dataById[0].vehicleId,
-        itemName: this.props.vehicle.dataById[0].vehicleName,
+        userId: this.props.auth.userInfo.id,
+        ownerId: passedData.ownerId,
+        itemId: passedData.id,
+        itemLocation: passedData.city,
+        itemNameType: passedData.type,
+        itemName: passedData.name,
         itemAmountRented: this.state.count,
-        itemPrice:
-          this.state.count *
-          this.props.vehicle.dataById[0].vehiclePrice *
-          this.state.duration,
-        bookingDate: this.formatDate(this.addDays(this.state.ReserveDate, 0)),
+        itemPrice: this.state.count * passedData.price * this.state.duration,
+        bookingDate: this.formatDate(this.addDays(this.state.reserveDate, 0)),
         expiredDate: this.formatDate(
-          this.addDays(this.state.ReserveDate, this.state.duration),
+          this.addDays(this.state.reserveDate, this.state.duration),
         ),
-        itemPicture: this.props.vehicle.dataById[0].vehicleImage.split(',')[0],
-        // model,
+        itemPicture: String(passedData.image).split(',')[0],
         itemAmountDay: this.state.duration,
       });
     }
   };
   componentDidMount() {
-    this.socket = io(`${API_URL}`);
+    // this.socket = io(`${API_URL}`);
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
-      const {itemId, editId} = this.props.route.params;
+      const {itemId} = this.props.route.params;
+      console.log(itemId);
       if (itemId) {
-        this.props.getVehicle(itemId);
-      }
-      if (editId) {
-        this.props.getVehicle(editId);
+        getVehicleById(itemId)
+          .then(({data}) => {
+            console.log(data);
+            this.setState({
+              data: data.result[0],
+            });
+          })
+          .catch(err => {
+            console.log(String(err).includes(404));
+            this.setState({
+              error: String(err).includes(404),
+            });
+          });
       }
     });
   }
@@ -153,31 +133,24 @@ class Component extends React.Component {
   //   this.setState({chatMessage: ''});
   // }
   render() {
-    const {ReserveDate, duration, count, open, showMessage, errorMessage} =
-      this.state;
-    const {
-      setDuration,
-      setOpenDate,
-      setCloseDate,
-      setReserveDate,
-      joinRoom,
-      onPressHandler,
-      decrementCount,
-      incrementCount,
-      hideModalError,
-    } = this;
+    const options = {year: 'numeric', month: 'long', day: 'numeric'};
+    const {reserveDate, data, duration, count, open} = this.state;
+    const {joinRoom, onPressHandler} = this;
     return (
       <>
-        {this.props.vehicle.dataById.length > 0 ? (
+        {!data && (
+          <View style={styles.loading}>
+            <ActivityIndicator size="large" />
+          </View>
+        )}
+        {data && (
           <ScrollView>
             <View style={styles.body}>
               <Image
                 style={styles.bgReservation}
                 resizeMethod="resize"
                 source={{
-                  uri: `${API_URL}${
-                    this.props.vehicle.dataById[0].vehicleImage.split(',')[0]
-                  }`,
+                  uri: `${API_URL}${String(data.image).split(',')[0]}`,
                 }}
               />
               <View style={styles.iconLeft}>
@@ -198,32 +171,26 @@ class Component extends React.Component {
 
               <View style={styles.titleItem}>
                 <View>
-                  {/* <Text style={styles.titleText}>{props.vehicle.dataById[0].name}</Text> */}
                   <Text style={styles.titleText}>
-                    {this.props.vehicle.dataById[0].vehicleName}
+                    {data.name}
                     {'\n'}
                     Rp.{' '}
-                    {Number(
-                      count *
-                        this.props.vehicle.dataById[0].vehiclePrice *
-                        duration,
-                    ).toLocaleString('de-DE')}
+                    {Number(count * data.price * duration).toLocaleString(
+                      'de-DE',
+                    )}
                     /day
                   </Text>
                   <Text style={styles.subtitleText}>
-                    Max for {this.props.vehicle.dataById[0].vehicleCapacity}{' '}
-                    person
+                    Max for {data.capacity} person
                   </Text>
                   <Text style={styles.subtitleText}>No prepayment</Text>
                   <Text
                     style={
-                      this.props.vehicle.dataById[0].vehicleQuantity > 0
+                      data.quantity > 0
                         ? styles.availableTxt
                         : styles.notAvailableTxt
                     }>
-                    {this.props.vehicle.dataById[0].vehicleQuantity > 0
-                      ? 'Available'
-                      : 'Not Available'}
+                    {data.quantity > 0 ? 'Available' : 'Not Available'}
                   </Text>
                 </View>
                 <Icon
@@ -235,8 +202,7 @@ class Component extends React.Component {
               <View style={styles.locationWrapper}>
                 <Icon name="location" style={styles.iconLocation} />
                 <Text style={styles.textLocation}>
-                  {this.props.vehicle.dataById[0].vehicleAddress},
-                  {this.props.vehicle.dataById[0].vehicleCity}
+                  {data.address},{data.city}
                 </Text>
               </View>
               <View style={styles.locationWrapper}>
@@ -245,20 +211,19 @@ class Component extends React.Component {
                   3.2 miles from your location
                 </Text>
               </View>
-              {this.state.showMessage === true ? (
-                <ModalError
-                  modalVisible={showMessage}
-                  hideModal={hideModalError}
-                  error={errorMessage}
-                  submitHandler={incrementCount}
-                />
-              ) : // <Text style={styles.errorText}>{this.state.errorMessage}</Text>
-              null}
+              {count === data.quantity
+                ? ToastAndroid.show('Quantity has maximum!', ToastAndroid.SHORT)
+                : null}
               <View style={styles.countBox}>
                 <Text style={styles.textCount}>Select quantity : </Text>
                 <View style={styles.countWrapper}>
                   <TouchableOpacity
-                    onPress={() => count > 1 && decrementCount(count - 1)}>
+                    onPress={() =>
+                      count > 1 &&
+                      this.setState({
+                        count: count - 1,
+                      })
+                    }>
                     <View style={styles.buttonCount}>
                       <Text style={styles.textButtonCount}> - </Text>
                     </View>
@@ -266,8 +231,10 @@ class Component extends React.Component {
                   <Text style={styles.amount}>{count}</Text>
                   <TouchableOpacity
                     onPress={() =>
-                      count < this.props.vehicle.dataById[0].vehicleQuantity &&
-                      incrementCount(count + 1)
+                      count < data.quantity &&
+                      this.setState({
+                        count: count + 1,
+                      })
                     }>
                     <View style={styles.buttonCount}>
                       <Text style={styles.textButtonCount}>+</Text>
@@ -278,13 +245,14 @@ class Component extends React.Component {
               <View style={styles.pickerWrapper}>
                 <Pressable
                   style={styles.dateBox}
-                  onPress={() => setOpenDate(true)}>
+                  onPress={() => this.setState({open: true})}>
                   <Text style={styles.textDate}>
-                    {typeof ReserveDate === 'object'
-                      ? ` ${new Date(ReserveDate).getFullYear()}-${new Date(
-                          ReserveDate,
-                        ).getMonth()}-${new Date(ReserveDate).getDate()}`
-                      : ReserveDate}
+                    {typeof reserveDate === 'object'
+                      ? ` ${new Date(reserveDate).toLocaleDateString(
+                          undefined,
+                          options,
+                        )}`
+                      : reserveDate}
                   </Text>
                 </Pressable>
                 <DatePicker
@@ -292,21 +260,21 @@ class Component extends React.Component {
                   mode="date"
                   open={open}
                   date={
-                    typeof ReserveDate === 'object' ? ReserveDate : new Date()
+                    typeof reserveDate === 'object' ? reserveDate : new Date()
                   }
                   onConfirm={date => {
-                    setCloseDate(false);
-                    setReserveDate(date);
+                    this.setState({open: false});
+                    this.setState({reserveDate: date});
                   }}
                   onCancel={() => {
-                    setCloseDate(false);
+                    this.setState({open: false});
                   }}
                 />
                 <View style={styles.selectBox}>
                   <Picker
                     selectedValue={duration}
                     onValueChange={(itemValue, index) =>
-                      setDuration(itemValue)
+                      this.setState({duration: itemValue})
                     }>
                     <Picker.Item
                       style={styles.textSelect}
@@ -331,18 +299,17 @@ class Component extends React.Component {
                   </Picker>
                 </View>
               </View>
-              {this.props.vehicle.dataById[0].vehicleOwnerId ===
-              this.props.auth.userInfo.Id ? (
+              {data.ownerId === this.props.auth.userInfo.id ? (
                 <TouchableOpacity
                   activeOpacity={0.7}
                   style={
-                    this.props.vehicle.dataById[0].vehicleQuantity > 0
+                    data.quantity > 0
                       ? styles.buttonEnabled
                       : styles.buttonDisabled
                   }
                   onPress={() =>
                     this.props.navigation.navigate('edit-vehicle', {
-                      vehicleId: this.props.vehicle.dataById[0].vehicleId,
+                      id: data.id,
                     })
                   }>
                   <Text style={styles.reservationText}>Edit Item</Text>
@@ -351,25 +318,17 @@ class Component extends React.Component {
                 <TouchableOpacity
                   activeOpacity={0.7}
                   style={
-                    this.props.vehicle.dataById[0].vehicleQuantity > 0
+                    data.quantity > 0
                       ? styles.buttonEnabled
                       : styles.buttonDisabled
                   }
                   onPress={onPressHandler}
-                  disabled={
-                    this.props.vehicle.dataById[0].vehicleQuantity < 1
-                      ? true
-                      : false
-                  }>
+                  disabled={data.quantity < 1 ? true : false}>
                   <Text style={styles.reservationText}>Reservation</Text>
                 </TouchableOpacity>
               )}
             </View>
           </ScrollView>
-        ) : (
-          <View style={styles.loading}>
-            <ActivityIndicator size="large" />
-          </View>
         )}
       </>
     );
@@ -383,12 +342,12 @@ const mapStateToProps = ({auth, vehicle}) => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
-  return {
-    getVehicle: params => {
-      dispatch(getVehicleByIdAction(params));
-    },
-  };
-};
+// const mapDispatchToProps = dispatch => {
+//   return {
+//     getVehicle: params => {
+//       dispatch(getVehicleByIdAction(params));
+//     },
+//   };
+// };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Component);
+export default connect(mapStateToProps)(Reservation);

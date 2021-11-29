@@ -24,37 +24,35 @@ class Component extends React.Component {
       expiredDate: new Date(this.props.route.params.expiredDate),
     };
   }
-  generateCode = number => {
-    number = 999;
-    return (
-      'TOV' +
-      Math.floor(this.props.route.params.userId + Math.random() * number) +
-      this.props.auth.token.slice(5, 7)
-    );
+  randomCode = () => {
+    const min = Math.ceil(11111111);
+    const max = Math.floor(99999999);
+    const payment_code = Math.floor(Math.random() * (max - min) + min);
+    return payment_code;
   };
+
   saveHandler = () => {
-    const bodyData = this.props.route.params;
+    const passedData = this.props.route.params;
     const token = this.props.auth.token;
+
     const body = {
-      vehicle_id: this.props.route.params.itemId,
-      user_id: this.props.route.params.userId,
-      owner_id: this.props.route.params.ownerId,
-      location: this.props.route.params.itemLocation,
-      type: this.props.route.params.itemNameType,
-      price: this.props.route.params.itemPrice,
-      from_date: `${this.state.bookingDate.getFullYear()}-${this.state.bookingDate.getMonth()}-${this.state.bookingDate.getDate()}`,
-      to_date: `${this.state.expiredDate.getFullYear()}-${this.state.expiredDate.getMonth()}-${this.state.expiredDate.getDate()}`,
+      vehicle_id: passedData.itemId,
+      user_id: passedData.userId,
+      owner_id: passedData.ownerId,
+      location: passedData.itemLocation,
+      type: passedData.itemNameType,
+      price: passedData.itemPrice,
+      from_date: passedData.bookingDate,
+      to_date: passedData.expiredDate,
       status_id: this.state.statusTransaction,
-      quantity: this.props.route.params.itemAmountRented,
-      method_payment: this.props.route.params.paymentOption,
-      booking_code: this.generateCode,
-      days: this.props.route.params.itemAmountDay,
+      quantity: passedData.itemAmountRented,
+      method_payment: passedData.paymentOption,
+      booking_code: this.randomCode(),
+      days: passedData.itemAmountDay,
     };
     this.props.createHistory(body, token);
-    this.props.navigation.navigate('third-payment', {
-      ...bodyData,
-      transactionId: this.props.history.data.result,
-      booking_code: this.generateCode(),
+    this.props.navigation.replace('third-payment', {
+      id: this.props.history.data.id,
     });
     ToastAndroid.show(
       'Successful, make payment immediately',
@@ -63,23 +61,21 @@ class Component extends React.Component {
   };
 
   render() {
-    // let bodyData = {...this.props.route.params};
-    const convertPrice =
-      this.props.route.params.itemPrice.toLocaleString('de-DE');
-    // console.log(this.props.history.data);
+    console.log(this.state.bookingDate);
     const {
       itemPicture,
       itemName,
       itemAmountRented,
       itemAmountDay,
+      itemPrice,
       paymentOption,
       bookingDate,
       expiredDate,
-      idCard,
-      userFullName,
-      userEmail,
-      userPhone,
-      userAddress,
+      cardNumber,
+      fullName,
+      email,
+      phoneNumber,
+      address,
     } = this.props.route.params;
     return (
       <>
@@ -106,7 +102,7 @@ class Component extends React.Component {
             </View>
             <View style={styles.textView}>
               <Text style={styles.textTitleCode}>Your booking code :</Text>
-              <Text style={styles.textCode}>{this.generateCode()}</Text>
+              <Text style={styles.textCode}>{this.randomCode()}</Text>
               <View style={styles.imageView}>
                 <Image
                   style={styles.imagesWrapper}
@@ -123,16 +119,18 @@ class Component extends React.Component {
                   {bookingDate} to {expiredDate}
                 </Text>
               </View>
-              <Text style={styles.textUser}>ID : {idCard}</Text>
+              <Text style={styles.textUser}>ID : {cardNumber}</Text>
               <Text style={styles.textUser}>
-                {userFullName}({userEmail})
+                {fullName}&nbsp;({email})
               </Text>
-              <Text style={styles.textUser}>{userPhone}</Text>
+              <Text style={styles.textUser}>{phoneNumber}</Text>
               <Text style={[styles.textUser, styles.borderBottom]}>
-                {userAddress}
+                {address}
               </Text>
               <View style={styles.priceView}>
-                <Text style={styles.textPrice}>Rp. {convertPrice}</Text>
+                <Text style={styles.textPrice}>
+                  Rp. {itemPrice.toLocaleString('de-DE')}
+                </Text>
                 <Icon name="information-circle" style={styles.textPrice} />
               </View>
             </View>

@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-  ActivityIndicator,
-} from 'react-native';
+import {View, Text, Image, ScrollView, ActivityIndicator} from 'react-native';
 import {connect} from 'react-redux';
 import styles from './Style';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -16,59 +9,24 @@ import IconHeader from '../../components/IconHeader/Component';
 import {API_URL} from '@env';
 
 class Component extends React.Component {
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //   };
-  // }
-
   componentDidMount() {
-    if (
-      this.props.route.params.historyId ||
-      this.props.route.params.transactionId
-    ) {
-      this.props.getHistory(
-        this.props.route.params.historyId ||
-          this.props.route.params.transactionId,
-        this.props.auth.token,
-      );
+    if (this.props.route.params.id) {
+      this.props.getHistory(this.props.route.params.id, this.props.auth.token);
     }
-    this.props.getProfile(
-      this.props.route.params.userId,
-      this.props.auth.token,
-    );
   }
 
   render() {
-    // const convertPrice = this.props.route.params.price.toLocaleString('de-DE');
-    // console.log(
-    //   'test',
-    //   this.props.route.params.itemPicture,
-    //   this.props.history.historyId[0].picture,
-    // );
-
-    const {
-      bookingCode,
-      itemAmountRented,
-      itemAmountDay,
-      itemPicture,
-      itemName,
-      itemPrice,
-      paymentOption,
-      bookingDate,
-      expiredDate,
-    } = this.props.route.params;
     return (
       <>
         <IconHeader
           text="History Detail"
           route={() => this.props.navigation.goBack('HistoryScreen')}
         />
-        {this.props.history.historyId.length && this.props.auth.data.length ? (
+        {this.props.history.data ? (
           <ScrollView>
             <View style={styles.background}>
               <View style={styles.textView}>
-                {this.props.history.historyId[0].status_number === 3 ? (
+                {this.props.history.data.orderStatus === 3 ? (
                   <Text style={styles.textCode}>Payment Success!</Text>
                 ) : (
                   <Text style={styles.textCode}>Wait Approved!</Text>
@@ -76,85 +34,58 @@ class Component extends React.Component {
 
                 <Text style={styles.textTitleCode}>Your booking code :</Text>
                 <Text style={styles.textCode}>
-                  {' '}
-                  {this.props.history.historyId.length
-                    ? this.props.history.historyId[0].booking_code
-                    : bookingCode}
+                  {this.props.history.data.bookingCode}
                 </Text>
                 <View style={styles.imageView}>
-                  {this.props.history.historyId.length ? (
-                    <Image
-                      style={styles.imagesWrapper}
-                      source={{
-                        uri: `${API_URL}${
-                          this.props.history.historyId[0].picture.split(',')[0]
-                        }`,
-                      }}
-                    />
-                  ) : (
-                    <Image
-                      style={styles.imagesWrapper}
-                      source={{
-                        uri: `${API_URL}${itemPicture}`,
-                      }}
-                    />
-                  )}
+                  <Image
+                    style={styles.imagesWrapper}
+                    source={{
+                      uri: `${API_URL}${
+                        String(this.props.history.data.picture).split(',')[0]
+                      }`,
+                    }}
+                  />
                 </View>
                 <View style={styles.textOrder}>
                   <Text style={styles.textVehicle}>
-                    {this.props.history.historyId.length
-                      ? this.props.history.historyId[0].quantity
-                      : itemAmountRented}{' '}
-                    {this.props.history.historyId.length
-                      ? this.props.history.historyId[0].name
-                      : itemName}
+                    {this.props.history.data.totalQuantity}&nbsp;
+                    {this.props.history.data.vehicleName}
                   </Text>
                   <Text style={styles.textVehicle}>
-                    {this.props.history.historyId.length
-                      ? this.props.history.historyId[0].method_payment
-                      : paymentOption}
+                    {this.props.history.data.paymentMethod}
                   </Text>
                   <Text style={styles.textVehicle}>
-                    {this.props.history.historyId.length
-                      ? this.props.history.historyId[0].days
-                      : itemAmountDay}{' '}
-                    days
+                    {this.props.history.data.dayDuration}&nbsp; days
                   </Text>
                   <Text style={[styles.textVehicle, styles.borderBottom]}>
-                    {this.props.history.historyId.length
-                      ? new Date(
-                          this.props.history.historyId[0].from_date,
-                        ).toLocaleDateString()
-                      : bookingDate}{' '}
-                    to{' '}
-                    {this.props.history.historyId.length
-                      ? new Date(
-                          this.props.history.historyId[0].to_date,
-                        ).toLocaleDateString()
-                      : expiredDate}
+                    {new Date(
+                      this.props.history.data.startDate,
+                    ).toLocaleDateString()}
+                    &nbsp;to&nbsp;
+                    {new Date(
+                      this.props.history.data.expiredDate,
+                    ).toLocaleDateString()}
                   </Text>
                 </View>
                 <Text style={styles.textUser}>
-                  ID : {this.props.auth.data[0].userIdCard}
+                  ID :&nbsp;{this.props.history.data.cardNumber}
                 </Text>
                 <Text style={styles.textUser}>
-                  {this.props.auth.data[0].userName} (
-                  {this.props.auth.data[0].userEmail})
+                  {this.props.history.data.customer} (
+                  {this.props.history.data.email})
                 </Text>
                 <Text style={styles.textUser}>
-                  {this.props.auth.data[0].userPhone}
+                  {this.props.history.data.phoneNumber}
                 </Text>
                 <Text style={[styles.textUser, styles.borderBottom]}>
-                  {this.props.auth.data[0].userAddress}
+                  {this.props.history.data.vehicleLocation}
                 </Text>
                 <View style={styles.priceView}>
                   <Text style={styles.textPrice}>
                     Rp.{' '}
-                    {this.props.history.historyId.length
-                      ? Number(
-                          this.props.history.historyId[0].price,
-                        ).toLocaleString('de-DE')
-                      : itemPrice}
+                    {Number(this.props.history.data.totalPrice).toLocaleString(
+                      'de-DE',
+                    )}
                   </Text>
                   <Icon name="information-circle" style={styles.textPrice} />
                 </View>

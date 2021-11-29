@@ -1,13 +1,11 @@
 import {
   GET_HISTORY_BY_ID,
-  GET_HISTORY_OWNER,
   GET_HISTORY_USER,
   POST_HISTORY,
   PATCH_HISTORY,
 } from './actionString';
 import {
   getHistoryById,
-  getHistoryOwner,
   getHistoryUser,
   postHistory,
   patchHistory,
@@ -25,18 +23,13 @@ export const patchHistoryAction = (params, body, token) => {
     payload: patchHistory(params, body, token),
   };
 };
-export const historyUserAction = (params, token) => {
+export const getHistoryUserAction = (params, token) => {
   return {
     type: GET_HISTORY_USER,
     payload: getHistoryUser(params, token),
   };
 };
-export const actionHistoryOwner = (params, token) => {
-  return {
-    type: GET_HISTORY_OWNER,
-    payload: getHistoryOwner(params, token),
-  };
-};
+
 export const historyByIdAction = (params, token) => {
   return {
     type: GET_HISTORY_BY_ID,

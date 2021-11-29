@@ -16,11 +16,7 @@ export const getHistoryUser = (params, token) => {
     headers: {'x-access-token': `Bearer ${token}`},
   });
 };
-export const getHistoryOwner = (params, token) => {
-  return Axios.get(`${API_URL}/history/owner/${params}`, {
-    headers: {'x-access-token': `Bearer ${token}`},
-  });
-};
+
 export const patchHistory = (params, body, token) => {
   return Axios.patch(`${API_URL}/history/${params}`, body, {
     headers: {'x-access-token': `Bearer ${token}`},

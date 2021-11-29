@@ -1,5 +1,4 @@
 import {StyleSheet} from 'react-native';
-import {backgroundColor} from 'styled-system';
 export default StyleSheet.create({
   loading: {
     height: '100%',
@@ -41,7 +40,7 @@ export default StyleSheet.create({
     backgroundColor: 'rgba(217, 217, 217, 0.3)',
     borderWidth: 1,
     borderRadius: 10,
-    borderColor: 'gray',
+    borderColor: 'rgba(217, 217, 217, 0.3)',
     paddingHorizontal: 15,
     marginHorizontal: 25,
     color: '#999999',
@@ -54,7 +53,7 @@ export default StyleSheet.create({
     backgroundColor: 'rgba(217, 217, 217, 0.3)',
     borderWidth: 1,
     borderRadius: 10,
-    borderColor: 'gray',
+    borderColor: 'rgba(217, 217, 217, 0.3)',
     color: '#000',
     marginHorizontal: 25,
     fontWeight: '600',
@@ -63,7 +62,10 @@ export default StyleSheet.create({
     marginBottom: 20,
   },
   textSelect: {
-    color: '#999999',
+    color: '#000',
+  },
+  placeHolderSelected: {
+    color: '#393939',
   },
   button: {
     width: 338,

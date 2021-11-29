@@ -40,9 +40,12 @@ export default StyleSheet.create({
   text: {
     fontFamily: 'Nunito-Reguler',
     fontSize: 14,
+    width: 180,
     fontWeight: 'bold',
     color: '#393939',
   },
+  status: {color: 'green'},
+  returned: {color: '#950101'},
   titleCard: {
     fontFamily: 'Nunito-Bold',
     fontSize: 22,
