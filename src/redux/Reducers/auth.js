@@ -14,6 +14,7 @@ const defaultState = {
   isFulfilled: false,
   isRejected: false,
   isLogin: false,
+  status: '',
   error: '',
 };
 
@@ -32,6 +33,7 @@ const authReducer = (prevstate = defaultState, action) => {
         ...prevstate,
         isPending: false,
         isRejected: true,
+        status: action.payload.response.status,
         error: action.payload,
       };
     case SIGN_IN.concat('_', Fulfilled):
@@ -79,6 +81,7 @@ const authReducer = (prevstate = defaultState, action) => {
         isPending: false,
         isRejected: true,
         error: action.payload,
+        status: action.payload.response.status,
       };
     case REGISTER.concat('_', Fulfilled):
       return {
@@ -87,13 +90,8 @@ const authReducer = (prevstate = defaultState, action) => {
         isFulfilled: true,
       };
     case RESET_STATE:
-      return {
-        ...prevstate,
-        isPending: false,
-        isFulfilled: false,
-        isRejected: false,
-        status: '',
-      };
+      return {...prevstate, ...action.payload};
+
     default:
       return prevstate;
   }

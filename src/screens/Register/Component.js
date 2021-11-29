@@ -12,7 +12,10 @@ import Modal from '../../components/ModalScreen/Component';
 import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './Style';
 import {connect} from 'react-redux';
-import {registerAction} from '../../redux/ActionCreators/auth';
+import {
+  registerAction,
+  resetStateAction,
+} from '../../redux/ActionCreators/auth';
 
 class Register extends Component {
   constructor(props) {
@@ -34,17 +37,6 @@ class Register extends Component {
     this.setState({modalVisible: false});
   };
 
-  errorHandler = () => {
-    if (
-      this.state.email === '' ||
-      this.state.phone === '' ||
-      this.state.password === ''
-    ) {
-      return this.submitHandler();
-    } else {
-      return this.showModal();
-    }
-  };
   submitHandler = () => {
     if (this.state.email.length < 1) {
       return this.setState({
@@ -76,28 +68,49 @@ class Register extends Component {
         errorMessage: 'Password must have 6 or more characters!',
       });
     }
-    if (this.props.auth.error) {
-      this.setState({
-        showMessage: true,
-        errorMessage: 'Email has registered',
-      });
-    }
+    return this.showModal();
+  };
+
+  onSubmit = () => {
     const form = new URLSearchParams();
     form.append('email', this.state.email);
     form.append('phone_number', this.state.phone);
     form.append('password', this.state.password);
     this.props.urlRegister(form);
-    this.props.navigation.replace('login');
-    ToastAndroid.show('Register has success', ToastAndroid.SHORT);
+    // if (this.props.auth.isFulfilled === false) {
+    //   this.props.navigation.replace('login');
+    // }
   };
 
   submitModal = () => {
-    this.submitHandler();
+    this.onSubmit();
     this.hideModal();
   };
+  errorHandler = () => {
+    this.setState({
+      showMessage: true,
+      errorMessage: 'Email has registered',
+    });
+  };
+  componentDidUpdate() {
+    if (this.props.auth.isFulfilled === true) {
+      const body = {isFulfilled: false, status: ''};
+      ToastAndroid.show('Register has success', ToastAndroid.SHORT);
+      this.props.navigation.reset({
+        index: 0,
+        routes: [{name: 'login'}],
+      });
+      return this.props.resetState(body);
+    }
+    if (this.props.auth.status === 409) {
+      const body = {isFulfilled: false, status: ''};
+      this.errorHandler();
+      return this.props.resetState(body);
+    }
+  }
 
   render() {
-    const {hideModal, errorHandler, submitModal} = this;
+    const {hideModal, submitModal} = this;
     return (
       <>
         <StatusBar hidden={true} />
@@ -115,12 +128,26 @@ class Register extends Component {
               style={styles.input}
               placeholder="Email"
               placeholderTextColor="#fff"
+              returnKeyType="next"
+              onSubmitEditing={() => {
+                this.secondTextInput.focus();
+              }}
+              blurOnSubmit={false}
               onChangeText={email => this.setState({email})}
             />
             <TextInput
               style={styles.input}
               placeholder="Mobile Phone"
               placeholderTextColor="#fff"
+              keyboardType="number-pad"
+              ref={input => {
+                this.secondTextInput = input;
+              }}
+              returnKeyType="next"
+              onSubmitEditing={() => {
+                this.thirdTextInput.focus();
+              }}
+              blurOnSubmit={false}
               onChangeText={phone => this.setState({phone})}
             />
             <TextInput
@@ -128,12 +155,16 @@ class Register extends Component {
               placeholder="Password"
               placeholderTextColor="#fff"
               secureTextEntry={true}
+              ref={input => {
+                this.thirdTextInput = input;
+              }}
+              onSubmitEditing={() => this.submitHandler()}
               onChangeText={password => this.setState({password})}
             />
             <TouchableOpacity
               activeOpacity={0.7}
               style={styles.buttonRegister}
-              onPress={errorHandler}>
+              onPress={this.submitHandler}>
               <Text style={styles.textButton}>Sign up</Text>
             </TouchableOpacity>
             <Modal
@@ -175,6 +206,9 @@ const mapDispatchToProps = dispatch => {
   return {
     urlRegister: body => {
       dispatch(registerAction(body));
+    },
+    resetState: body => {
+      dispatch(resetStateAction(body));
     },
   };
 };

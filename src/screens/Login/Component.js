@@ -11,7 +11,7 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import style from './Style';
 import {connect} from 'react-redux';
-import {loginAction} from '../../redux/ActionCreators/auth';
+import {loginAction, resetStateAction} from '../../redux/ActionCreators/auth';
 
 class Login extends Component {
   constructor(props) {
@@ -24,35 +24,29 @@ class Login extends Component {
     };
   }
 
-  submitHandler = () => {
+  onSubmit = () => {
     if (this.state.email.length < 1) {
-      this.setState({
+      return this.setState({
         showMessage: true,
         errorMessage: 'Email is Required',
       });
     }
     if (!this.state.email.includes('@')) {
-      this.setState({
+      return this.setState({
         showMessage: true,
         errorMessage: 'Please input a Valid Email',
       });
     }
     if (this.state.password.length < 1) {
-      this.setState({
+      return this.setState({
         showMessage: true,
         errorMessage: 'Password is Required',
       });
     }
     if (this.state.password.length < 6) {
-      this.setState({
+      return this.setState({
         showMessage: true,
         errorMessage: 'Password must have 6 or more characters!',
-      });
-    }
-    if (this.props.auth.error) {
-      this.setState({
-        showMessage: true,
-        errorMessage: 'Invalid E-mail or Password!',
       });
     }
     const body = {
@@ -60,11 +54,28 @@ class Login extends Component {
       password: this.state.password,
     };
     this.props.urlLogin(body);
-    ToastAndroid.show('Login has success', ToastAndroid.SHORT);
+  };
+
+  errorHandler = () => {
+    this.setState({
+      showMessage: true,
+      errorMessage: 'Invalid E-mail or Password!',
+    });
   };
   componentDidUpdate() {
-    if (this.props.auth.token !== '') {
-      this.props.navigation.replace('home');
+    if (this.props.auth.isFulfilled === true) {
+      const body = {isFulfilled: false, status: ''};
+      ToastAndroid.show('Login has success', ToastAndroid.SHORT);
+      this.props.navigation.reset({
+        index: 0,
+        routes: [{name: 'home'}],
+      });
+      this.props.resetState(body);
+    }
+    if (this.props.auth.status === 404) {
+      const body = {isFulfilled: false, status: ''};
+      this.errorHandler();
+      this.props.resetState(body);
     }
   }
   render() {
@@ -86,6 +97,11 @@ class Login extends Component {
               autoCorrect={false}
               placeholder="Email"
               placeholderTextColor="#fff"
+              returnKeyType="next"
+              onSubmitEditing={() => {
+                this.secondTextInput.focus();
+              }}
+              blurOnSubmit={false}
               onChangeText={email => this.setState({email})}
             />
             <TextInput
@@ -93,6 +109,10 @@ class Login extends Component {
               placeholder="Password"
               secureTextEntry={true}
               placeholderTextColor="#fff"
+              ref={input => {
+                this.secondTextInput = input;
+              }}
+              onSubmitEditing={() => this.onSubmit()}
               onChangeText={password => this.setState({password})}
             />
             <Text
@@ -104,7 +124,7 @@ class Login extends Component {
             <TouchableOpacity
               activeOpacity={0.7}
               style={style.buttonLogin}
-              onPress={this.submitHandler}>
+              onPress={this.onSubmit}>
               <Text style={style.textButton}>Login</Text>
             </TouchableOpacity>
             <TouchableOpacity activeOpacity={0.7} style={style.buttonGoogle}>
@@ -136,6 +156,9 @@ const mapDispatchToProps = dispatch => {
   return {
     urlLogin: body => {
       dispatch(loginAction(body));
+    },
+    resetState: body => {
+      dispatch(resetStateAction(body));
     },
   };
 };

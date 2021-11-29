@@ -11,11 +11,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {API_URL} from '@env';
 import {connect} from 'react-redux';
 import styles from './Style';
-import {logoutAction} from '../../redux/ActionCreators/auth';
-import {
-  getProfileAction,
-  resetStateAction,
-} from '../../redux/ActionCreators/user';
+import {logoutAction, resetStateAction} from '../../redux/ActionCreators/auth';
+import {getProfileAction} from '../../redux/ActionCreators/user';
 import Modal from '../../components/ModalScreen/Component';
 
 class Profile extends React.Component {
@@ -36,12 +33,7 @@ class Profile extends React.Component {
 
   logoutHandler = () => {
     const token = this.props.auth.token;
-    const reduxAuth = this.props.user.data;
     this.props.logout(token);
-    if (reduxAuth.isFulfilled) {
-    }
-    this.props.navigation.replace('login');
-    ToastAndroid.show('Logout has success', ToastAndroid.SHORT);
   };
 
   submitHandler = () => {
@@ -54,18 +46,32 @@ class Profile extends React.Component {
       const token = this.props.auth.token;
       const reduxAuth = this.props.auth.userInfo;
       if (!token) {
-        this.props.navigation.replace('login');
+        this.props.navigation.reset({
+          index: 0,
+          routes: [{name: 'login'}],
+        });
+        const body = {isFulfilled: false, status: ''};
+        return this.props.resetState(body);
       }
       if (token) {
         this.props.getProfile(reduxAuth.id, token);
-        this.props.resetState();
+
         // setTimeout(() => {
         //   this.props.resetState();
         // }, 1000);
       }
-      if (this.props.user.isFulfilled) {
-      }
     });
+  }
+  componentDidUpdate() {
+    if (this.props.auth.isFulfilled === true) {
+      const body = {isFulfilled: false, status: ''};
+      this.props.navigation.reset({
+        index: 0,
+        routes: [{name: 'login'}],
+      });
+      ToastAndroid.show('Logout has success', ToastAndroid.SHORT);
+      return this.props.resetState(body);
+    }
   }
   componentWillUnmount() {
     this._unsubscribe();

@@ -58,8 +58,9 @@ export const patchPasswordAction = (params, body, token) => {
   };
 };
 
-export const resetStateAction = () => {
+export const resetStateAction = body => {
   return {
     type: RESET_STATE,
+    payload: body,
   };
 };
