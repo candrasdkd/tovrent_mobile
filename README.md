@@ -78,11 +78,11 @@ Yarn run android
 - [Databases](https://drive.google.com/file/d/1MvkMSXtZnCTnE68XxkQGP5dKRqIGWF6j/view?usp=sharing)
 - [APK](https://drive.google.com/file/d/14OpqF_xZLhoyjyUXL9718Xcsdfg_3ALk/view?usp=sharing)
 
-</br>
+
 
 ## Related Projects
 
 ---
 
 - [TOVrent Website](https://github.com/candrasdkd/TOVrent_Client)
-- [TOVrent Backend](https://github.com/sulthanqintara/React-Rental-King-Motor)
+- [TOVrent Backend](https://github.com/candrasdkd/TOVrent_Server)
