@@ -61,11 +61,14 @@ Yarn run android
 ### Screen Shot Apps
 
 ---
+
+</br>
+
 <p align="center">
-<img title="Login" src="assets\images\tov_login.png" width="180" height="300"/>
-<img title="Home"  src="assets\images\tov_home.png" width="180" height="300"/>
-<img title="Reservation" src="assets\images\tov_search.png" width="180" height="300"/>
-<img title="Profile"  src="assets\images\tov_profile.png" width="180" height="300"/>
+<img title="Login" src="assets\images\tov_login.png" width="180" height="300"/>&nbsp;
+<img title="Home"  src="assets\images\tov_home.png" width="180" height="300"/>&nbsp;
+<img title="Search" src="assets\images\tov_search.png" width="180" height="300"/>&nbsp;
+<img title="Profile"  src="assets\images\tov_profile.png" width="180" height="300"/>&nbsp;
 </p>
 
 </br>
