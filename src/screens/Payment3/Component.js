@@ -16,7 +16,8 @@ import {ProgressBar, Colors} from 'react-native-paper';
 import Header from '../../components/IconHeader/Component';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Modal from '../../components/ModalScreen/Component';
-import {notification} from '../../components/Notification/Component';
+// import {notification} from '../../components/Notification/Component';
+// import PushNotification from 'react-native-push-notification';
 
 class Component extends React.Component {
   constructor(props) {
@@ -39,26 +40,37 @@ class Component extends React.Component {
   ownerTransaction = () => {
     this.setState({statusTransaction: 3});
   };
-  notification = () => {
-    if (this.props.auth.userInfo.authLevel === 3) {
-      notification.configure();
-      notification.sendChannel('1');
-      notification.sendNotification(
-        '1',
-        'Payment Success',
-        'You has success for payment',
-      );
-    }
-    if (this.props.auth.userInfo.authLevel === 2) {
-      notification.configure();
-      notification.sendChannel('2');
-      notification.sendNotification(
-        '2',
-        'Payment Has Aceept',
-        'You has accept for history',
-      );
-    }
-  };
+  // confirmNotification = (result, resultModel) => {
+  //   PushNotification.localNotification({
+  //     channelId: 'transaction-channel',
+  //     title: 'Payment has been Confirmed',
+  //     message:
+  //       'Your payment for ' +
+  //       this.props.history.data.vehicleName +
+  //       ' Has been confirmed!',
+  //     id: this.props?.route?.params.id || this.props.history?.data.id,
+  //   });
+  // };
+  // notification = () => {
+  //   if (this.props.auth.userInfo.authLevel === 3) {
+  //     notification.configure();
+  //     notification.sendChannel('1');
+  //     notification.sendNotification(
+  //       '1',
+  //       'Payment Success',
+  //       'You has success for payment',
+  //     );
+  //   }
+  //   if (this.props.auth.userInfo.authLevel === 2) {
+  //     notification.configure();
+  //     notification.sendChannel('2');
+  //     notification.sendNotification(
+  //       '2',
+  //       'Payment Has Aceept',
+  //       'You has accept for history',
+  //     );
+  //   }
+  // };
   saveHandler = () => {
     const passedData = this.props.route.params.id;
     const token = this.props.auth.token;
@@ -84,6 +96,7 @@ class Component extends React.Component {
   };
   submitHandler = () => {
     this.saveHandler();
+    // this.confirmNotification();
     this.hideModal();
   };
   componentDidMount() {
@@ -156,11 +169,7 @@ class Component extends React.Component {
               Use booking code to pick up your vespa
             </Text>
             <TouchableOpacity activeOpacity={0.7} style={styles.buttonCopy}>
-              <Text
-                style={styles.textButtonCopy}
-                onPress={() => {
-                  this.props.navigation.replace('history-detail');
-                }}>
+              <Text style={styles.textButtonCopy}>
                 Copy Payment & Booking Code
               </Text>
             </TouchableOpacity>

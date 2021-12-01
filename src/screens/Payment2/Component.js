@@ -14,6 +14,7 @@ import {postHistoryAction} from '../../redux/ActionCreators/history';
 import IconHeader from '../../components/IconHeader/Component';
 import {API_URL} from '@env';
 import {ProgressBar, Colors} from 'react-native-paper';
+import PushNotification from 'react-native-push-notification';
 
 class Component extends React.Component {
   constructor(props) {
@@ -30,7 +31,15 @@ class Component extends React.Component {
     const payment_code = Math.floor(Math.random() * (max - min) + min);
     return payment_code;
   };
-
+  notificationHandler = (result, resultModel) => {
+    PushNotification.localNotification({
+      channelId: 'transaction-channel',
+      title: 'Finish Your Payment',
+      bigText: "Let's finish your payment for " + resultModel,
+      message: 'Payment Code : ' + result.booking_code,
+      subText: 'Payment Code : ' + result.booking_code,
+    });
+  };
   saveHandler = () => {
     const passedData = this.props.route.params;
     const token = this.props.auth.token;
@@ -51,6 +60,7 @@ class Component extends React.Component {
       days: passedData.itemAmountDay,
     };
     this.props.createHistory(body, token);
+    this.notificationHandler(body, passedData.itemName);
     this.props.navigation.replace('third-payment', {
       id: this.props.history.data.id,
     });
@@ -61,7 +71,7 @@ class Component extends React.Component {
   };
 
   render() {
-    console.log(this.state.bookingDate);
+    console.log(this.props.route.params);
     const {
       itemPicture,
       itemName,

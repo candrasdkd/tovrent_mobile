@@ -11,24 +11,30 @@ export const postLogin = body => {
   return Axios.post(`${API_URL}/auth/login`, body);
 };
 
-export const getProfile = (params, token) => {
-  return Axios.get(`${API_URL}/users/${params}`, {
-    headers: {'x-access-token': `Bearer ${token}`},
-  });
-};
+// export const getProfile = (params, token) => {
+//   return Axios.get(`${API_URL}/users/${params}`, {
+//     headers: {'x-access-token': `Bearer ${token}`},
+//   });
+// };
 
-export const patchPassword = (params, body, token) => {
-  return Axios.patch(`${API_URL}/users/password/${params}`, body, {
-    headers: {'x-access-token': `Bearer ${token}`},
-  });
-};
+// export const patchPassword = (params, body, token) => {
+//   return Axios.patch(`${API_URL}/users/password/${params}`, body, {
+//     headers: {'x-access-token': `Bearer ${token}`},
+//   });
+// };
 
-export const patchProfile = (params, body, token) => {
-  return Axios.patch(`${API_URL}/users/${params}`, body, {
-    headers: {'x-access-token': `Bearer ${token}`},
-  });
-};
+// export const patchProfile = (params, body, token) => {
+//   return Axios.patch(`${API_URL}/users/${params}`, body, {
+//     headers: {'x-access-token': `Bearer ${token}`},
+//   });
+// };
 
 export const deleteLogout = token => {
   return Axios.delete(`${API_URL}/auth/logout`, {token: token});
+};
+
+export const getPatchToken = token => {
+  return Axios.get(`${API_URL}/auth/check`, {
+    headers: {'x-access-token': `Bearer ${token}`},
+  });
 };

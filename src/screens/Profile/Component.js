@@ -14,7 +14,7 @@ import styles from './Style';
 import {logoutAction, resetStateAction} from '../../redux/ActionCreators/auth';
 import {getProfileAction} from '../../redux/ActionCreators/user';
 import Modal from '../../components/ModalScreen/Component';
-
+import socket from '../../components/Socket/SocketIo';
 class Profile extends React.Component {
   constructor(props) {
     super(props);
@@ -34,9 +34,12 @@ class Profile extends React.Component {
   logoutHandler = () => {
     const token = this.props.auth.token;
     this.props.logout(token);
+    // this.props.navigation.replace('login');
   };
 
   submitHandler = () => {
+    socket.off(this.props.auth.userInfo.id);
+    // socket.off(`transaction_${this.props.auth.userInfo.id}`);
     this.logoutHandler();
     this.hideModal();
   };
@@ -45,15 +48,12 @@ class Profile extends React.Component {
     this._unsubscribe = this.props.navigation.addListener('focus', () => {
       const token = this.props.auth.token;
       const reduxAuth = this.props.auth.userInfo;
-      if (!token) {
-        this.props.navigation.reset({
-          index: 0,
-          routes: [{name: 'login'}],
-        });
+      if (token === '') {
+        this.props.navigation.replace('login');
         const body = {isFulfilled: false, status: ''};
         return this.props.resetState(body);
       }
-      if (token) {
+      if (token !== '') {
         this.props.getProfile(reduxAuth.id, token);
 
         // setTimeout(() => {

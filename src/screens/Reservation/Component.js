@@ -135,7 +135,7 @@ class Reservation extends React.Component {
   render() {
     const options = {year: 'numeric', month: 'long', day: 'numeric'};
     const {reserveDate, data, duration, count, open} = this.state;
-    const {joinRoom, onPressHandler} = this;
+    const {onPressHandler} = this;
     return (
       <>
         {!data && (
@@ -196,7 +196,12 @@ class Reservation extends React.Component {
                 <Icon
                   name="chatbubble-outline"
                   style={styles.chatIcon}
-                  onPress={joinRoom}
+                  onPress={() =>
+                    this.props.navigation.navigate('detail-chat', {
+                      receiverId: data.ownerId,
+                      user: data.ownerName,
+                    })
+                  }
                 />
               </View>
               <View style={styles.locationWrapper}>

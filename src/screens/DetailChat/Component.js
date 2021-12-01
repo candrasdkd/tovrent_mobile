@@ -1,63 +1,113 @@
-import React from 'react';
-import {View, Text, TextInput, TouchableOpacity} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {View, Text, Pressable, ScrollView} from 'react-native';
 import styles from './Style';
-import Header from '../../components/IconHeader/Component';
-import Icon from 'react-native-vector-icons/Ionicons';
-import {io} from 'socket.io-client';
+// import socket from '../../components/Socket/SocketIo';
 import {API_URL} from '@env';
-class Component extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      chatMessage: '',
+import io from 'socket.io-client';
+
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import ChatRoomCard from '../../components/ChatRoomCard/Component';
+import {getChat, postChat} from '../../utils/https/chat';
+import {useSelector} from 'react-redux';
+import {TextInput} from 'react-native-gesture-handler';
+
+const ChatRoom = props => {
+  const scrollViewRef = useRef();
+  const auth = useSelector(state => state.auth);
+  const [chatData, setChatData] = useState([]);
+  const [message, setMessage] = useState('');
+  const getChatHandler = () => {
+    const params = {
+      sender_id: auth.userInfo.id,
+      receiver_id: props.route.params.receiverId,
     };
-  }
+    return getChat(params, auth.token)
+      .then(data => {
+        setChatData(data.data.result);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
 
-  componentDidMount() {
-    this.socket = io(`${API_URL}`);
-  }
+  const onSendHandler = () => {
+    const body = {
+      user_id_sender: auth.userInfo.id,
+      user_id_receiver: props.route.params.receiverId,
+      text: message,
+    };
+    return postChat(body, auth.token)
+      .then(() => {
+        getChatHandler();
+        return setMessage('');
+      })
+      .catch(err => console.log(err.response));
+  };
 
-  submitChatMessage() {
-    this.socket.emit('chat message', this.state.chatMessage);
-    this.setState({chatMessage: ''});
-  }
-  render() {
-    return (
-      <>
-        <Header
-          text="Detail Chat"
-          route={() => this.props.navigation.goBack('chat')}
-        />
-        <View style={styles.container}>
-          <View style={styles.userWrapper}>
-            <Text style={styles.textUser}>
-              Hey, can I book 2 vespa for January 18 to 21?
-            </Text>
-          </View>
-          <View style={styles.ownerWrapper}>
-            <Text style={styles.textOwner}>
-              Hey thanks for asking, it’s available now you can do reservation
-              and pay for the vespa so they’re ready for you
-            </Text>
-          </View>
-          <View style={styles.inputView}>
-            <TextInput
-              style={styles.input}
-              value={this.state.chatMessage}
-              placeholder="Please input text"
-              placeholderTextColor="#999999"
-              onChangeText={chatMessage => this.setState({chatMessage})}
-            />
-            <TouchableOpacity
-              style={styles.iconView}
-              onPress={() => this.submitChatMessage()}>
-              <Icon name="send" style={styles.iconSend} />
-            </TouchableOpacity>
-          </View>
+  useEffect(() => {
+    let socket = io(API_URL);
+    getChatHandler();
+    socket.on(auth.userInfo.id, data => {
+      getChatHandler();
+    });
+    return () => {
+      socket.off(auth.userInfo.id);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <View style={[styles.header, styles.headerContainer]}>
+        <View style={styles.title}>
+          <Pressable onPress={() => props.navigation.goBack()}>
+            <Ionicons name="chevron-back-outline" size={28} />
+          </Pressable>
+          <Text style={styles.titleTxt}>
+            {props.route.params.user ? props.route.params.user : 'Chat Room'}
+          </Text>
         </View>
-      </>
-    );
-  }
-}
+      </View>
+      <ScrollView
+        ref={scrollViewRef}
+        onContentSizeChange={() =>
+          scrollViewRef.current.scrollToEnd({animated: true})
+        }
+        style={styles.chatContainer}>
+        {chatData?.map(chat => {
+          return (
+            <ChatRoomCard
+              {...props}
+              data={chat}
+              senderId={chat.user_id_sender}
+              key={chat.id}
+            />
+          );
+        })}
+      </ScrollView>
+      <View style={styles.messageContainer}>
+        <TextInput
+          multiline={true}
+          style={styles.messageInput}
+          numberOfLines={3}
+          placeholder="Type a message"
+          value={message}
+          onChange={e => {
+            setMessage(e.nativeEvent.text);
+          }}
+        />
+        <Ionicons name="camera" size={28} style={styles.camIcon} color="grey" />
+        <Pressable onPress={onSendHandler}>
+          <Ionicons
+            name="send"
+            size={22}
+            style={styles.sendIcon}
+            color="grey"
+          />
+        </Pressable>
+      </View>
+    </View>
+  );
+};
 
-export default Component;
+export default ChatRoom;

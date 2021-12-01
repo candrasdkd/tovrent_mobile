@@ -8,11 +8,12 @@ import {
   TouchableOpacity,
   ToastAndroid,
 } from 'react-native';
+import socket from '../../components/Socket/SocketIo';
 import Icon from 'react-native-vector-icons/Ionicons';
 import style from './Style';
 import {connect} from 'react-redux';
 import {loginAction, resetStateAction} from '../../redux/ActionCreators/auth';
-
+import PushNotification from 'react-native-push-notification';
 class Login extends Component {
   constructor(props) {
     super(props);
@@ -22,6 +23,7 @@ class Login extends Component {
       showMessage: false,
       errorMessage: '',
     };
+    this.myRef = React.createRef(true);
   }
 
   onSubmit = () => {
@@ -65,12 +67,27 @@ class Login extends Component {
   componentDidUpdate() {
     if (this.props.auth.isFulfilled === true) {
       const body = {isFulfilled: false, status: ''};
-      ToastAndroid.show('Login has success', ToastAndroid.SHORT);
+      socket.on('connect');
+      socket.on(this.props.auth.userInfo.id, data => {
+        PushNotification.localNotification({
+          channelId: 'chat-channel',
+          title: 'Chat from ' + data.senderName,
+          message: data.message,
+        });
+      });
+      // socket.on(`transaction_${this.props.auth.userInfo.id}`, data => {
+      //   PushNotification.localNotification({
+      //     channelId: 'transaction-channel',
+      //     title: data.title,
+      //     message: data.message,
+      //   });
+      // });
       this.props.navigation.reset({
         index: 0,
         routes: [{name: 'home'}],
       });
       this.props.resetState(body);
+      ToastAndroid.show('Login has success', ToastAndroid.SHORT);
     }
     if (this.props.auth.status === 404) {
       const body = {isFulfilled: false, status: ''};

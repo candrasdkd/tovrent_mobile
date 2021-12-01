@@ -14,6 +14,8 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from 'react-native';
+// import socket from '../../components/Socket/SocketIo';
+// import PushNotification from 'react-native-push-notification';
 import {getVehicles, getPopular} from '../../utils/https/vehicle';
 
 class Home extends React.Component {
@@ -171,6 +173,23 @@ class Home extends React.Component {
       this.paginasiMotorbike();
       this.paginasiBike();
     });
+    // if (this.props.auth.token !== '') {
+    //   socket.on('connect');
+    //   socket.on(this.props.auth.userInfo.id, data => {
+    //     PushNotification.localNotification({
+    //       channelId: 'chat-channel',
+    //       title: 'Chat from ' + data.senderName,
+    //       message: data.message,
+    //     });
+    //   });
+    //   socket.on(`transaction_${this.props.auth.userInfo.id}`, data => {
+    //     PushNotification.localNotification({
+    //       channelId: 'transaction-channel',
+    //       title: data.title,
+    //       message: data.message,
+    //     });
+    //   });
+    // }
   }
 
   componentWillUnmount() {

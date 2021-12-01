@@ -1,65 +1,37 @@
 import {StyleSheet} from 'react-native';
+
 export default StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
+  container: {flex: 1, backgroundColor: 'white'},
+  header: {
+    alignItems: 'center',
+    elevation: 10,
+    paddingBottom: 10,
   },
-  userWrapper: {
-    width: 237,
-    height: 57,
-    alignSelf: 'flex-end',
-    marginVertical: 10,
-    marginHorizontal: 20,
-  },
-  textUser: {
-    width: 237,
-    height: 57,
-    borderRadius: 15,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    backgroundColor: '#393939',
-    color: '#fff',
-  },
-  ownerWrapper: {
-    width: 237,
-    height: 500,
-    marginVertical: 10,
-    marginHorizontal: 20,
-  },
-  textOwner: {
-    fontSize: 14,
-    borderRadius: 15,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    backgroundColor: '#FFCD61',
-    color: '#4E4E4E',
-  },
-  input: {
-    backgroundColor: 'rgba(217, 217, 217, 0.3)',
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: 'gray',
-    paddingHorizontal: 15,
-    color: '#999999',
-    fontWeight: '600',
-    width: 300,
-    height: 50,
-  },
-  inputView: {
+  headerContainer: {backgroundColor: 'white', paddingHorizontal: 18},
+  title: {
+    marginTop: 25,
     flexDirection: 'row',
-    marginHorizontal: 25,
+    marginRight: 'auto',
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  iconView: {
-    width: 50,
-    height: 50,
+  titleTxt: {
+    fontSize: 28,
+    fontWeight: '600',
+    marginLeft: 20,
+  },
+  chatContainer: {
+    paddingHorizontal: 18,
+  },
+  messageContainer: {
+    flexDirection: 'row',
     borderRadius: 10,
-    justifyContent: 'center',
-    backgroundColor: '#FFCD61',
+    backgroundColor: '#DFDEDE',
+    marginHorizontal: 18,
+    marginBottom: 18,
+    alignItems: 'center',
   },
-  iconSend: {
-    fontSize: 20,
-    color: '#393939',
-    textAlign: 'center',
-  },
+  camIcon: {marginRight: 10},
+  sendIcon: {marginRight: 18},
+  messageInput: {paddingLeft: 18, flex: 1, paddingVertical: 0},
 });
